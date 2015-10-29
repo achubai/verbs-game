@@ -1,0 +1,30 @@
+{
+  "name": "verbs-game",
+  "version": "1.0.0",
+  "description": "verbs-game",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/achubai/verbs-game.git"
+  },
+  "author": "achubai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/achubai/verbs-game/issues"
+  },
+  "homepage": "https://github.com/achubai/verbs-game#readme",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "cookie-parser": "^1.4.0",
+    "debug": "^2.2.0",
+    "express": "^4.13.3",
+    "mongodb": "^2.0.47",
+    "mongoose": "^4.2.3",
+    "monk": "^1.0.1",
+    "morgan": "^1.6.1"
+  }
+}
