@@ -1,0 +1,10 @@
+$icon-font-path: '../fonts/';
+
+// bower:scss
+  @import '../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss';
+// endbower
+
+.container {
+  width: 1000px;
+  margin: 0 auto;
+}

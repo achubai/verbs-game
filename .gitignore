@@ -6,3 +6,4 @@ bower_components
 test
 .idea
 data
+public/bower_components

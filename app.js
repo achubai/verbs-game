@@ -36,17 +36,73 @@ var Verb = mongoose.model('Verb', verbSchema, 'verbs');
 
 var app = express();
 
+app.use(express.static(__dirname + '/public'));
+
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-router.get('/', function (req, res) {
-    res.sendfile(path.join(__dirname+'/index.html'));
-});
+var exports = module.exports = {};
 
-router.get('/admin', function (req, res) {
-    res.sendfile(path.join(__dirname+'/admin.html'));
-});
+exports.index = function (req, res) {
+    res.render('index.html');
+};
+
+router.route('/', router.index);
+
+router.route('/verbs')
+    .post(function(req, res) {
+        var verb = new Verb();
+        verb.v1 = 'some';
+
+        verb.save(function(err) {
+            if (err)
+                res.send(err);
+
+            res.json({ message: 'Verb created!' });
+        });
+    })
+    .get(function(req, res) {
+        Verb.find(function(err, verbs) {
+            if (err)
+                res.send(err);
+
+            res.json(verbs);
+        });
+    });
+
+router.route('/verbs/:id')
+    .put(function (req, res) {
+        Verb.findById(req.params.id, function(err, verb){
+            if (err)
+                res.send(err);
+
+            verb.save(function (err) {
+                if (err)
+                    res.send(err);
+
+                res.json({ message: 'Verb updated!' });
+            });
+        });
+    })
+    .get(function (req, res) {
+        Verb.findById(req.params.id, function(err, verb){
+            if (err)
+                res.send(err);
+
+            res.json(verb);
+        });
+    })
+    .delete(function (req, res) {
+        Verb.remove({
+            _id: req.params.id
+        }, function(err, verb) {
+            if (err)
+                res.send(err);
+
+            res.json({ message: 'Successfully deleted' });
+        })
+    });
 
 app.use('/api', router);
 app.listen(3000);
