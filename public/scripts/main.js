@@ -8,7 +8,12 @@ require.config({
         jquery: 'libs/jquery-2.1.4.min',
         underscore: 'libs/underscore',
         backbone: 'libs/backbone',
-        bootstrap: 'bower_components/bootstrap/js/bootstrap'
+        bootstrap: '../../bower_components/bootstrap/js/bootstrap'
+    },
+    shim: {
+        "jquery.bootstrap": {
+            deps: ["jquery"]
+        }
     }
 });
 

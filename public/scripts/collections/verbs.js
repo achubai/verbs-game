@@ -15,7 +15,5 @@ define([
         }
     });
 
-    var verbsCollection = new VerbsCollection();
-
-    return verbsCollection;
+    return VerbsCollection;
 })

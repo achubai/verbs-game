@@ -12,9 +12,28 @@
 </head>
 <body>
 
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#verb-edit-modal">
+      Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="verb-edit-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
     <div class="layout">
-        <div class="container"></div>
-        
+        <div class="container">
+            <a href="#verbs/create" class="btn btn-success pull-right">Add verb</a>
+            <ul class="nav nav-pills">
+                <li role="presentation" class="active"><a href="#">Home</a></li>
+                <li role="presentation"><a href="#verbs">Verbs</a></li>
+            </ul>
+        </div>
+
+        <div class="container b-verbs-container"></div>
     </div>
 
     <script data-main="scripts/main" src="scripts/libs/require.js"></script>
@@ -26,11 +45,59 @@
         <td><%= v3 %></td>
         <td><%= ing %></td>
         <td><%= translate %></td>
-        <td><a href="">
-            <a href=""><i class="glyphicon glyphicon-pencil"></i></a> 
-            <a href=""><i class="glyphicon glyphicon-remove"></i></a>
+        <td>
+            <a href="#verbs/edit/<%= typeof(_id)!== 'undefined' ?  _id : '' %>" class="edit"><i class="glyphicon glyphicon-pencil"></i></a>
+            <a href="" class="remove"><i class="glyphicon glyphicon-remove"></i></a>
         </td>
 
+    </script>
+
+    <script type="text/template" id="verbs-item-edit">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">
+                <%=
+                    typeof(translate)!== 'undefined' ?  translate : 'New verb'
+                %>
+            </h4>
+        </div>
+        <div class="modal-body b-verbs-edit form-inline">
+            <div class="form-group">
+                <label for="">V1</label>
+                <input id="v1" type="text" class="form-control" value="<%=
+                        typeof(v1)!== 'undefined' ?  v1 : ''
+                    %>">
+            </div>
+            <div class="form-group">
+                <label for="">V2</label>
+                <input id="v2" type="text" class="form-control" value="<%=
+                        typeof(v2)!== 'undefined' ?  v2 : ''
+                    %>">
+            </div>
+            <div class="form-group">
+                <label for="">V3</label>
+                <input id="v3" type="text" class="form-control" value="<%=
+                        typeof(v3)!== 'undefined' ?  v3 : ''
+                    %>">
+            </div>
+            <div class="form-group">
+                <label for="">-ing</label>
+                <input id="ing" type="text" class="form-control" value="<%=
+                        typeof(ing)!== 'undefined' ?  ing : ''
+                    %>">
+            </div>
+            <div class="form-group">
+                <label for="">Translate</label>
+                <input id="translate" type="text" class="form-control" value="<%=
+                        typeof(translate)!== 'undefined' ?  translate : ''
+                    %>">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+        
     </script>
 </body>
 </html>

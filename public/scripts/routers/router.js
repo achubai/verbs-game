@@ -4,22 +4,53 @@
 
 define([
     'backbone',
-    '../views/all-verbs-list'
-],function (Backbone, allVerbsView) {
+    '../views/all-verbs-list',
+    '../views/verb-item-edit',
+    '../models/verb'
+],function (Backbone, allVerbsView, VerbItemEditView, VerbModel) {
     var Router = Backbone.Router.extend({
         routes: {
-            '': 'allVerbs',
-            '/verbs': 'allVerbs'
+            '': 'index',
+            'verbs': 'allVerbs',
+            'verbs/edit/:id': 'editVerb',
+            'verbs/create': 'createVerb'
         },
         index: function () {
-            console.log('a');
+            console.log('index route');
         },
         allVerbs: function () {
-            allVerbsView.render();
+            if (allVerbsView.collection.length) {
+                allVerbsView.render();
+            } else {
+                window.router.navigate('/');
+            }
+        },
+        editVerb: function () {
+            var id = Backbone.history.fragment.replace(/^.*[\\\/]/, '');
+            var model = allVerbsView.collection.findWhere({_id: id});
+
+            if (allVerbsView.collection.length) {
+                if (model) {
+                    var verbItemEditView = new VerbItemEditView({model: model});
+                    verbItemEditView.render();
+                } else {
+                    console.log('model not found');
+                }
+            } else {
+                window.router.navigate('/');
+            }
+        },
+        createVerb: function () {
+            if (allVerbsView.collection.length) {
+                allVerbsView.createNewView();
+
+            } else {
+                window.router.navigate('/');
+            }
         }
     });
 
-    var router = new Router();
+    window.router = new Router();
     Backbone.history.start();
 
 });

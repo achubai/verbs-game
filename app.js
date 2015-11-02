@@ -52,8 +52,14 @@ router.route('/', router.index);
 
 router.route('/verbs')
     .post(function(req, res) {
+
         var verb = new Verb();
-        verb.v1 = 'some';
+
+        verb.v1 = req.body.v1;
+        verb.v2 = req.body.v2;
+        verb.v3 = req.body.v3;
+        verb.ing = req.body.ing;
+        verb.translate = req.body.translate;
 
         verb.save(function(err) {
             if (err)
@@ -77,11 +83,15 @@ router.route('/verbs/:id')
             if (err)
                 res.send(err);
 
+            verb.v1 = req.body.v1;
+            verb.v2 = req.body.v2;
+            verb.v3 = req.body.v3;
+            verb.ing = req.body.ing;
+            verb.translate = req.body.translate;
+
             verb.save(function (err) {
                 if (err)
                     res.send(err);
-
-                res.json({ message: 'Verb updated!' });
             });
         });
     })
