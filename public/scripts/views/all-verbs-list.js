@@ -6,40 +6,50 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'collections/verbs',
     'views/all-verbs-item',
     'views/verb-item-edit',
     'models/verb',
     'bootstrap'
-], function ($, _, Backbone, VerbsCollection, AllVerbsItem, VerbItemEditView, VerbModel) {
+], function ($, _, Backbone, AllVerbsItem, VerbItemEditView, VerbModel) {
 
-    var AllVerbsView = Backbone.View.extend({
+    return Backbone.View.extend({
         tagName: 'table',
         className: 'b-verbs-table table',
         initialize: function () {
-            this.listenTo(this.collection, 'add', this.renderOne, this);
+
         },
         render: function () {
-            $('.b-verbs-container').append(this.$el);
+            this.$el.html('');
 
+            var that = this;
+            this.collection.each(function (el) {
+                var item = new AllVerbsItem({model: el});
+
+                that.$el.append(item.el);
+            });
+
+            $('.b-verbs-container').html('').append(this.$el);
+            console.log('render');
             return this;
         },
         renderOne: function (el) {
             var item = new AllVerbsItem({model: el});
             this.$el.append(item.el);
+            console.log('renderOne');
         },
         addNew: function (model) {
+            console.log('addNew');
             this.collection.create(model, {'silent': true});
             this.listenToOnce(this.collection, 'sync', this.fetchNewModel);
             this.destroyVerbView();
         },
         fetchNewModel: function (model, res) {
+            console.log('fetchNewModel');
             model.set({_id: res.id });
             this.renderOne(model);
-            console.log(this.collection);
         },
         createVerbView: function () {
-
+            console.log('createVerbView');
             this.verbItemEditView = new VerbItemEditView({model : new VerbModel});
             this.verbItemEditView.render();
 
@@ -47,11 +57,10 @@ define([
             this.listenToOnce(this.verbItemEditView, 'removeNewModel', this.destroyVerbView);
         },
         destroyVerbView: function () {
+            console.log('destroyVerbView');
             this.stopListening(this.verbItemEditView);
             this.verbItemEditView = undefined;
         }
     });
-
-    return new AllVerbsView({collection: new VerbsCollection()});
 
 });

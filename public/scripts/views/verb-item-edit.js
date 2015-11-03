@@ -34,7 +34,7 @@ define([
         },
         close: function () {
             this.trigger('removeNewModel', this.model);
-            window.router.navigate('verbs', {trigger: true, replace: true});
+            window.router.navigate('verbs');
             this.undelegateEvents();
         },
         saveModel: function () {
@@ -57,7 +57,7 @@ define([
             }
 
             this.$modal.modal('hide');
-            window.router.navigate('verbs', {trigger: true, replace: true});
+            window.router.navigate('verbs');
             this.undelegateEvents();
         }
 

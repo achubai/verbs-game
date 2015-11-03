@@ -4,10 +4,11 @@
 
 define([
     'backbone',
+    '../collections/verbs',
     '../views/all-verbs-list',
     '../views/verb-item-edit',
-    '../models/verb'
-],function (Backbone, allVerbsView, VerbItemEditView, VerbModel) {
+    '../views/home'
+],function (Backbone, VerbsCollection, AllVerbsView, VerbItemEditView, HomeView) {
     var Router = Backbone.Router.extend({
         routes: {
             '': 'index',
@@ -15,40 +16,37 @@ define([
             'verbs/edit/:id': 'editVerb',
             'verbs/create': 'createVerb'
         },
+        initialize: function () {
+            this.collection = new VerbsCollection();
+
+            this.listenToOnce(this.collection, 'collectionFetched', this.started);
+        },
+        started: function () {
+            this.allVerbsView = new AllVerbsView({collection: this.collection});
+            this.homeView = new HomeView({collection: this.collection});
+            Backbone.history.start();
+        },
         index: function () {
-            $('.b-verbs-container').html('');
-            setTimeout(function(){
-                console.log(allVerbsView.collection);
-            }, 10);
+            this.homeView.render();
         },
         allVerbs: function () {
-            if (allVerbsView.collection.length) {
-                allVerbsView.render();
-            } else {
-                window.router.navigate('/', {trigger: true, replace: true});
-            }
+            this.allVerbsView.render();
         },
         editVerb: function () {
             var id = Backbone.history.fragment.replace(/^.*[\\\/]/, '');
-            var model = allVerbsView.collection.findWhere({_id: id});
+            var model = this.allVerbsView.collection.findWhere({_id: id});
 
-            if (allVerbsView.collection.length) {
-                if (model) {
-                    var verbItemEditView = new VerbItemEditView({model: model});
-                    verbItemEditView.render();
-                } else {
-                    console.log('model not found');
-                }
+            if (model) {
+                var verbItemEditView = new VerbItemEditView({model: model});
+                verbItemEditView.render();
             } else {
-                window.router.navigate('/', {trigger: true, replace: true});
+                console.log('model not found');
             }
         },
         createVerb: function () {
-            allVerbsView.createVerbView();
+            this.allVerbsView.createVerbView();
         }
     });
 
     window.router = new Router();
-    Backbone.history.start();
-
 });

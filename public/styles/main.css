@@ -20,3 +20,11 @@
 .b-verbs-edit .form-group .form-control {
 	width: 300px;
 }
+.b-home {
+	width: 400px;
+	margin: 50px auto;
+}
+
+.b-home h1 {
+	text-align: center;
+}

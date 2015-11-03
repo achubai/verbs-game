@@ -11,7 +11,11 @@ define([
         model: VerbModel,
         url: '/api/verbs',
         initialize: function () {
-            this.fetch();
+            var that = this;
+
+            this.fetch().done(function () {
+                that.trigger('collectionFetched', that);
+            });
         }
     });
 
