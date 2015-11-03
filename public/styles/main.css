@@ -4,8 +4,9 @@
   margin: 0 auto;
 }
 
-.nav-pills {
-  padding: 20px 0;
+.b-header {
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .b-verbs-edit {}

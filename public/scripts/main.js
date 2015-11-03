@@ -11,7 +11,7 @@ require.config({
         bootstrap: '../../bower_components/bootstrap/js/bootstrap'
     },
     shim: {
-        "jquery.bootstrap": {
+        'bootstrap': {
             deps: ["jquery"]
         }
     }

@@ -33,14 +33,12 @@ define([
             return this;
         },
         close: function () {
-            console.log(this.model.isNew());
-            if(this.model.isNew()) {
-                this.model.destroy();
-            }
-
-            window.router.navigate('/verbs');
+            this.trigger('removeNewModel', this.model);
+            window.router.navigate('verbs', {trigger: true, replace: true});
+            this.undelegateEvents();
         },
         saveModel: function () {
+
             this.model.set({
                 v1: this.$el.find('#v1').val(),
                 v2: this.$el.find('#v2').val(),
@@ -50,13 +48,17 @@ define([
             });
 
             if (this.model.isNew()) {
-                this.trigger('addNewModel', this.model);
+                this.trigger('addNewModel', this.model.toJSON());
             } else {
+
                 this.model.save({error: function(){
                     console.log('can not be saved');
                 }});
-                console.log(this.model.url());
             }
+
+            this.$modal.modal('hide');
+            window.router.navigate('verbs', {trigger: true, replace: true});
+            this.undelegateEvents();
         }
 
     });

@@ -12,20 +12,15 @@
 </head>
 <body>
 
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#verb-edit-modal">
-      Launch demo modal
-    </button>
-
     <!-- Modal -->
-    <div class="modal fade" id="verb-edit-modal" tabindex="-1">
+    <div class="modal fade" id="verb-edit-modal" data-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content"></div>
         </div>
     </div>
 
     <div class="layout">
-        <div class="container">
+        <div class="b-header container">
             <a href="#verbs/create" class="btn btn-success pull-right">Add verb</a>
             <ul class="nav nav-pills">
                 <li role="presentation" class="active"><a href="#">Home</a></li>
@@ -46,7 +41,9 @@
         <td><%= ing %></td>
         <td><%= translate %></td>
         <td>
-            <a href="#verbs/edit/<%= typeof(_id)!== 'undefined' ?  _id : '' %>" class="edit"><i class="glyphicon glyphicon-pencil"></i></a>
+            <% if (typeof(_id)!== 'undefined') {%>
+            <a href="#verbs/edit/<%= _id %>" class="edit"><i class="glyphicon glyphicon-pencil"></i></a>
+            <% } %>
             <a href="" class="remove"><i class="glyphicon glyphicon-remove"></i></a>
         </td>
 

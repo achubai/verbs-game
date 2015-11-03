@@ -16,13 +16,16 @@ define([
             'verbs/create': 'createVerb'
         },
         index: function () {
-            console.log('index route');
+            $('.b-verbs-container').html('');
+            setTimeout(function(){
+                console.log(allVerbsView.collection);
+            }, 10);
         },
         allVerbs: function () {
             if (allVerbsView.collection.length) {
                 allVerbsView.render();
             } else {
-                window.router.navigate('/');
+                window.router.navigate('/', {trigger: true, replace: true});
             }
         },
         editVerb: function () {
@@ -37,16 +40,11 @@ define([
                     console.log('model not found');
                 }
             } else {
-                window.router.navigate('/');
+                window.router.navigate('/', {trigger: true, replace: true});
             }
         },
         createVerb: function () {
-            if (allVerbsView.collection.length) {
-                allVerbsView.createNewView();
-
-            } else {
-                window.router.navigate('/');
-            }
+            allVerbsView.createVerbView();
         }
     });
 

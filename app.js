@@ -61,11 +61,11 @@ router.route('/verbs')
         verb.ing = req.body.ing;
         verb.translate = req.body.translate;
 
-        verb.save(function(err) {
+        verb.save(function(err, mod) {
             if (err)
                 res.send(err);
 
-            res.json({ message: 'Verb created!' });
+            res.json({ message: 'Verb created!', id: mod._id });
         });
     })
     .get(function(req, res) {

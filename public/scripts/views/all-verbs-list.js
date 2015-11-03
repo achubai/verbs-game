@@ -29,16 +29,26 @@ define([
             this.$el.append(item.el);
         },
         addNew: function (model) {
-            this.collection.create(model, {wait: true});
-
-            this.verbItemEditView = undefined;
+            this.collection.create(model, {'silent': true});
+            this.listenToOnce(this.collection, 'sync', this.fetchNewModel);
+            this.destroyVerbView();
         },
-        createNewView: function () {
+        fetchNewModel: function (model, res) {
+            model.set({_id: res.id });
+            this.renderOne(model);
+            console.log(this.collection);
+        },
+        createVerbView: function () {
 
             this.verbItemEditView = new VerbItemEditView({model : new VerbModel});
             this.verbItemEditView.render();
 
             this.listenToOnce(this.verbItemEditView, 'addNewModel', this.addNew);
+            this.listenToOnce(this.verbItemEditView, 'removeNewModel', this.destroyVerbView);
+        },
+        destroyVerbView: function () {
+            this.stopListening(this.verbItemEditView);
+            this.verbItemEditView = undefined;
         }
     });
 
