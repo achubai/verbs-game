@@ -14,12 +14,12 @@ define([
 
     return Backbone.View.extend({
         tagName: 'table',
-        className: 'b-verbs-table table',
+        className: 'b-verbs-table table verbs-tab-block',
         initialize: function () {
 
         },
         render: function () {
-            this.$el.html('');
+            this.$el.show();
 
             var that = this;
             this.collection.each(function (el) {
@@ -28,28 +28,28 @@ define([
                 that.$el.append(item.el);
             });
 
-            $('.b-verbs-container').html('').append(this.$el);
-            console.log('render');
+            $('.b-verbs-container').append(this.$el);
+
             return this;
         },
         renderOne: function (el) {
             var item = new AllVerbsItem({model: el});
             this.$el.append(item.el);
-            console.log('renderOne');
+
         },
         addNew: function (model) {
             console.log('addNew');
             this.collection.create(model, {'silent': true});
             this.listenToOnce(this.collection, 'sync', this.fetchNewModel);
-            this.destroyVerbView();
+
         },
         fetchNewModel: function (model, res) {
-            console.log('fetchNewModel');
+
             model.set({_id: res.id });
             this.renderOne(model);
         },
         createVerbView: function () {
-            console.log('createVerbView');
+
             this.verbItemEditView = new VerbItemEditView({model : new VerbModel});
             this.verbItemEditView.render();
 
@@ -57,7 +57,7 @@ define([
             this.listenToOnce(this.verbItemEditView, 'removeNewModel', this.destroyVerbView);
         },
         destroyVerbView: function () {
-            console.log('destroyVerbView');
+
             this.stopListening(this.verbItemEditView);
             this.verbItemEditView = undefined;
         }

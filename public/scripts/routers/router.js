@@ -27,9 +27,11 @@ define([
             Backbone.history.start();
         },
         index: function () {
+            this.hideAllTabs();
             this.homeView.render();
         },
         allVerbs: function () {
+            this.hideAllTabs();
             this.allVerbsView.render();
         },
         editVerb: function () {
@@ -45,6 +47,9 @@ define([
         },
         createVerb: function () {
             this.allVerbsView.createVerbView();
+        },
+        hideAllTabs: function () {
+            $('.verbs-tab-block').hide();
         }
     });
 

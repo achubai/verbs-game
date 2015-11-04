@@ -28,3 +28,34 @@
 .b-home h1 {
 	text-align: center;
 }
+
+.b-home .form-control {
+	text-align: center;
+	margin-bottom: 10px;
+}
+.b-home .hint {
+	color: #ececec;
+	text-align: center;
+	font-size: 13px;
+}
+.b-home .counter {
+	padding-top: 15px;
+}
+
+.b-home .counter .line {
+	margin-bottom: 15px;
+}
+.b-home .counter .line .value {
+	font-weight: bold;
+	padding-left: 5px;
+}
+.b-home .counter .line-error {
+	color: #d43f3a;
+}
+.b-home .counter .line-success {
+	color: #eea236;
+}
+
+.b-game-progress {
+	border-radius: 0;
+}

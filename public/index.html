@@ -7,6 +7,7 @@
     <title>new</title>
 
     <link rel="stylesheet" href="bower_components/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="styles/animate.css">
     <link rel="stylesheet" href="styles/main.css">
 
 </head>
@@ -20,6 +21,9 @@
     </div>
 
     <div class="layout">
+        <div class="b-game-progress progress">
+            <div class="progress-bar" style="width: 0%;"></div>
+        </div>
         <div class="b-header container">
             <a href="#verbs/create" class="btn btn-success pull-right">Add verb</a>
             <ul class="nav nav-pills">
@@ -51,9 +55,19 @@
     </script>
 
     <script type="text/template" id="home-template">
-        <h1><%= translate %> in past </h1>
-        <input type="text" class="form-control">
-        <div class="count"></div>
+        <h1>V<%= time %> <%= translate %> </h1>
+        <input type="text" class="form-control input-lg">
+        <div class="hint">Enter</div>
+        <div class="counter">
+            <div class="line line-success">
+                <i class="glyphicon animated glyphicon-ok-sign"></i>
+                <span class="value">0</span>
+            </div>
+            <div class="line line-error">
+                <i class="glyphicon animated glyphicon-remove-sign"></i>
+                <span class="value">0</span>
+            </div>
+        </div>
     </script>
 
     <script type="text/template" id="verbs-item-edit">
