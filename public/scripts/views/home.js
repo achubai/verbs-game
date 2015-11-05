@@ -17,17 +17,20 @@ define([
             'keypress .form-control': 'checkVerb'
         },
         initialize: function () {
+            this.gameLength = 15;
+            this.gameAllRandom = true;
             this.time = 1;
-            this.verbs  = this.collection.models;
+            this.verbs  = this.randomVerbs();
             this.gameCount = 0;
             this.succcessCount = 0;
 
             this.$progress = $('.b-game-progress');
         },
         render: function () {
-            console.log(this.verbs);
-            var model = _.extend(this.pseudoRandomVerb().toJSON(), {
-                time: this.time
+            var verb = this.gameAllRandom ? this.pseudoRandomVerb() : this.pseudoRandomVerb().toJSON();
+
+            var model = _.extend(verb , {
+                time: this.gameAllRandom ? 'a' : this.time
             });
 
             this.$el.show();
@@ -42,41 +45,102 @@ define([
 
             return this;
         },
-        pseudoRandomVerb: function (elem) {
-            if (elem) {
-                this.verbs = _.reject(this.verbs, function(el){
-                    return el == elem;
-                });
+        randomVerbs: function () {
+            var allRandomVerbs = [];
+            var verb;
+            var found = false;
+
+            if(this.gameAllRandom) {
+                while (allRandomVerbs.length < this.gameLength) {
+                    verb = this.collection.models[_.random(this.collection.models.length - 1)];
+                    found = false;
+                    var verbForm = 'v' + _.random(1, 3);
+                    var obj = {};
+                    obj['_id'] = verb.get('_id');
+                    obj[verbForm] = verb.get(verbForm);
+                    obj['translate'] = verb.get('translate');
+
+                    for (var i = 0; i < allRandomVerbs.length; i++){
+                        if(_.isEqual(allRandomVerbs[i], obj)){
+                            found = true;
+                            break
+                        }
+                    }
+                    if (!found) allRandomVerbs.push(obj);
+                }
+            } else {
+                while (allRandomVerbs.length < (this.gameLength / 3)) {
+                    verb = this.collection.models[_.random(this.collection.models.length - 1)];
+                    found = false;
+
+                    for (var j = 0; j < allRandomVerbs.length; j++){
+                        if(allRandomVerbs[j]['attributes']['_id'] == verb['attributes']['_id']){
+                            found = true;
+                            break
+                        }
+                    }
+                    if (!found) allRandomVerbs.push(verb);
+                }
             }
 
-            if (this.verbs.length != 0) {
+            return allRandomVerbs;
+        },
+        pseudoRandomVerb: function (elem) {
+            if(this.gameAllRandom) {
+                if (elem) {
+                    this.verbs = _.reject(this.verbs, function (el) {
+                        return el == elem;
+                    });
+                }
 
-                this.verb = this.verbs[_.random(this.verbs.length - 1)];
+                if (this.verbs.length != 0) {
+                    this.verb = this.verbs[_.random(this.verbs.length - 1)];
 
-                return this.verb;
+                    return this.verb;
+                } else {
+                    this.endGame();
+
+                    return false;
+                }
+
             } else {
-                this.endGame();
-                return false;
+                if (elem) {
+                    this.verbs = _.reject(this.verbs, function (el) {
+                        return el == elem;
+                    });
+                }
+
+                if (this.verbs.length != 0) {
+                    this.verb = this.verbs[_.random(this.verbs.length - 1)];
+
+                    return this.verb;
+                } else {
+                    this.endGame();
+
+                    return false;
+                }
             }
         },
         checkVerb: function (e) {
             if (e.keyCode == 13) {
-
                 var value = this.$input.val().trim();
 
                 if (value != '') {
                     this.gameProgress();
 
-                    if (value.toLowerCase() == this.verb.get('v' + this.time).toLowerCase()) {
-                        this.succcessCount++;
-                        this.successCounter('success');
+                    if (this.gameAllRandom) {
+                        // ????????? ?????
                     } else {
-                        console.log(this.verb.get('v' + this.time));
-                        this.successCounter('error');
+                        if (value.toLowerCase() == this.verb.get('v' + this.time).toLowerCase()) {
+                            this.succcessCount++;
+                            this.successCounter('success');
+                        } else {
+                            console.log(this.verb.get('v' + this.time));
+                            this.successCounter('error');
+                        }
+
+                        this.newVerb();
                     }
-
-                    this.newVerb();
-
                 }
             }
         },
@@ -102,9 +166,9 @@ define([
         },
         gameProgress: function () {
             this.gameCount++;
-            var progress = this.getPercent(this.gameCount, (this.collection.length * 3));
+            var progress = this.getPercent(this.gameCount, this.gameLength);
 
-            this.$progress.find('.progress-bar').text(this.gameCount + ' / ' + this.collection.length * 3).width(progress + '%');
+            this.$progress.find('.progress-bar').text(this.gameCount + ' / ' + this.gameLength).width(progress + '%');
         },
         successCounter: function (status) {
             var num = status == 'success' ? this.succcessCount : this.gameCount - this.succcessCount;

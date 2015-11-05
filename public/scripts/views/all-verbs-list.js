@@ -19,23 +19,26 @@ define([
 
         },
         render: function () {
-            this.$el.show();
 
-            var that = this;
-            this.collection.each(function (el) {
-                var item = new AllVerbsItem({model: el});
 
-                that.$el.append(item.el);
-            });
+            if(!$('.b-verbs-table').length) {
 
-            $('.b-verbs-container').append(this.$el);
+                var that = this;
+                this.collection.each(function (el) {
+                    var item = new AllVerbsItem({model: el});
 
-            return this;
+                    that.$el.append(item.el);
+                });
+                $('.b-verbs-container').append(this.$el);
+
+                return this;
+            } else {
+                this.$el.show();
+            }
         },
         renderOne: function (el) {
             var item = new AllVerbsItem({model: el});
             this.$el.append(item.el);
-
         },
         addNew: function (model) {
             console.log('addNew');
