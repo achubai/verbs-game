@@ -14,23 +14,23 @@ define([
         className: 'b-home verbs-tab-block',
         template: _.template($('#home-template').html()),
         events: {
-            'keypress .form-control': 'checkVerb'
+            'keypress .form-control': 'checkVerb',
+            'click .btn-play-again': 'gameReset'
         },
         initialize: function () {
             this.gameLength = 15;
             this.gameAllRandom = true;
-            this.time = 1;
-            this.verbs  = this.randomVerbs();
+            this.verbs = this.collection.getVerbsArray(this.gameAllRandom, this.gameLength);
+            this.verb = this.getRandomVerb();
+            this.time = this.gameAllRandom ? this.verb['time'] : 1;
             this.gameCount = 0;
             this.succcessCount = 0;
 
             this.$progress = $('.b-game-progress');
         },
         render: function () {
-            var verb = this.gameAllRandom ? this.pseudoRandomVerb() : this.pseudoRandomVerb().toJSON();
-
-            var model = _.extend(verb , {
-                time: this.gameAllRandom ? 'a' : this.time
+            var model = _.extend(this.verb, {
+                time: this.time
             });
 
             this.$el.show();
@@ -40,85 +40,25 @@ define([
             this.$title = this.$el.find('h1');
             this.$input = this.$el.find('.form-control');
             this.$counter = this.$el.find('.counter');
+            this.$bntPlayAgain = this.$el.find('.btn-play-again');
 
             this.$input.focus();
 
             return this;
         },
-        randomVerbs: function () {
-            var allRandomVerbs = [];
-            var verb;
-            var found = false;
-
-            if(this.gameAllRandom) {
-                while (allRandomVerbs.length < this.gameLength) {
-                    verb = this.collection.models[_.random(this.collection.models.length - 1)];
-                    found = false;
-                    var verbForm = 'v' + _.random(1, 3);
-                    var obj = {};
-                    obj['_id'] = verb.get('_id');
-                    obj[verbForm] = verb.get(verbForm);
-                    obj['translate'] = verb.get('translate');
-
-                    for (var i = 0; i < allRandomVerbs.length; i++){
-                        if(_.isEqual(allRandomVerbs[i], obj)){
-                            found = true;
-                            break
-                        }
-                    }
-                    if (!found) allRandomVerbs.push(obj);
-                }
-            } else {
-                while (allRandomVerbs.length < (this.gameLength / 3)) {
-                    verb = this.collection.models[_.random(this.collection.models.length - 1)];
-                    found = false;
-
-                    for (var j = 0; j < allRandomVerbs.length; j++){
-                        if(allRandomVerbs[j]['attributes']['_id'] == verb['attributes']['_id']){
-                            found = true;
-                            break
-                        }
-                    }
-                    if (!found) allRandomVerbs.push(verb);
-                }
+        getRandomVerb: function (elem) {
+            if (elem) {
+                this.verbs = _.reject(this.verbs, function (el) {
+                    return el == elem;
+                });
             }
 
-            return allRandomVerbs;
-        },
-        pseudoRandomVerb: function (elem) {
-            if(this.gameAllRandom) {
-                if (elem) {
-                    this.verbs = _.reject(this.verbs, function (el) {
-                        return el == elem;
-                    });
-                }
-
-                if (this.verbs.length != 0) {
-                    this.verb = this.verbs[_.random(this.verbs.length - 1)];
-
-                    return this.verb;
-                } else {
-                    this.endGame();
-
-                    return false;
-                }
-
+            if (this.verbs.length != 0) {
+                this.verb = this.verbs[_.random(this.verbs.length - 1)];
+                return this.verb;
             } else {
-                if (elem) {
-                    this.verbs = _.reject(this.verbs, function (el) {
-                        return el == elem;
-                    });
-                }
-
-                if (this.verbs.length != 0) {
-                    this.verb = this.verbs[_.random(this.verbs.length - 1)];
-
-                    return this.verb;
-                } else {
-                    this.endGame();
-
-                    return false;
-                }
+                this.verb = false;
+                this.endGame();
             }
         },
         checkVerb: function (e) {
@@ -128,41 +68,47 @@ define([
                 if (value != '') {
                     this.gameProgress();
 
-                    if (this.gameAllRandom) {
-                        // ????????? ?????
+                    if (value.toLowerCase() == this.verb['v' + this.time].toLowerCase()) {
+                        this.succcessCount++;
+                        this.successCounter('success');
                     } else {
-                        if (value.toLowerCase() == this.verb.get('v' + this.time).toLowerCase()) {
-                            this.succcessCount++;
-                            this.successCounter('success');
-                        } else {
-                            console.log(this.verb.get('v' + this.time));
-                            this.successCounter('error');
-                        }
-
-                        this.newVerb();
+                        console.log(this.verb['v' + this.time]);
+                        this.successCounter('error');
                     }
+
+                    this.newVerb();
                 }
             }
         },
         newVerb: function () {
-            this.newTime();
-            if (this.time == 1) {
-                this.pseudoRandomVerb(this.verb)
-                this.renderNew();
+            if (this.gameAllRandom) {
+                this.getRandomVerb(this.verb);
             } else {
-                this.renderNew()
+                if (this.time == 1) {
+                    this.getRandomVerb(this.verb);
+                }
+            }
+            if (this.verb) {
+                this.newTime();
+                this.renderNew();
             }
         },
         newTime: function () {
-            this.time = (this.time % 3);
-            this.time++;
+            if(this.gameAllRandom) {
+                this.time = this.verb['time'];
+            } else {
+                this.time = (this.time % 3);
+                this.time++;
+            }
         },
         renderNew: function () {
-            this.$title.text('V' + this.time + ' ' + this.verb.get('translate'));
+            this.$title.text('V' + this.time + ' ' + this.verb['translate']);
             this.$input.val('').focus();
         },
         endGame: function () {
-            alert('You have ' + this.getPercent((this.gameCount - this.succcessCount), this.gameCount) + '% errors');
+            this.$title.html('You have ' + Math.round(this.getPercent((this.gameCount - this.succcessCount), this.gameCount)) + '% errors');
+            this.$input.hide();
+            this.$bntPlayAgain.show().focus();
         },
         gameProgress: function () {
             this.gameCount++;
@@ -176,7 +122,7 @@ define([
             this.$counter.find('.line-' + status).find('.value').text(num);
             this.$counter.find('.line-' + status).find('.glyphicon').addClass('bounce');
 
-            that = this;
+            var that = this;
 
             setTimeout(function () {
                 that.$counter.find('.line-' + status).find('.glyphicon').removeClass('bounce');
@@ -184,6 +130,17 @@ define([
         },
         getPercent: function (y , x) {
             return (y / x) * 100;
+        },
+        gameReset: function () {
+            this.verbs = this.collection.getVerbsArray(this.gameAllRandom, this.gameLength);
+            this.verb = this.getRandomVerb();
+            this.time = this.gameAllRandom ? this.verb['time'] : 1;
+            this.gameCount = 0;
+            this.succcessCount = 0;
+
+            this.render();
+            this.$progress.find('.progress-bar').text('').width(0);
+            $(document).off('keypress');
         }
 
     });

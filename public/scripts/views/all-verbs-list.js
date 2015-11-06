@@ -35,6 +35,7 @@ define([
             } else {
                 this.$el.show();
             }
+
         },
         renderOne: function (el) {
             var item = new AllVerbsItem({model: el});

@@ -36,13 +36,11 @@
     </div>
 
     <script data-main="scripts/main" src="scripts/libs/require.js"></script>
-
+<!-- <td><%= ing %></td> -->
     <script type="text/template" id="verbs-item">
-
         <td><%= v1 %></td>
         <td><%= v2 %></td>
         <td><%= v3 %></td>
-        <td><%= ing %></td>
         <td><%= translate %></td>
         <td>
             <% if (typeof(_id)!== 'undefined') {%>
@@ -53,10 +51,13 @@
         </td>
 
     </script>
-
+    
     <script type="text/template" id="home-template">
         <h1>V<%= time %> <%= translate %> </h1>
         <input type="text" class="form-control input-lg">
+        <div class="text-center">
+            <button class="btn-play-again btn btn-success btn-lg">Play again</button>
+        </div>
         <div class="hint">Enter</div>
         <div class="counter">
             <div class="line line-success">

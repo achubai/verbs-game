@@ -59,3 +59,8 @@
 .b-game-progress {
 	border-radius: 0;
 }
+
+.b-home .btn-play-again {
+	margin-bottom: 10px;
+	display: none;
+}
