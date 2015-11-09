@@ -47,6 +47,7 @@ define([
             return this;
         },
         getRandomVerb: function (elem) {
+
             if (elem) {
                 this.verbs = _.reject(this.verbs, function (el) {
                     return el == elem;
@@ -54,6 +55,7 @@ define([
             }
 
             if (this.verbs.length != 0) {
+                console.log(this.verbs, this.verbs.length != 0);
                 this.verb = this.verbs[_.random(this.verbs.length - 1)];
                 return this.verb;
             } else {
@@ -83,13 +85,15 @@ define([
         newVerb: function () {
             if (this.gameAllRandom) {
                 this.getRandomVerb(this.verb);
+                this.newTime();
             } else {
+                this.newTime();
                 if (this.time == 1) {
                     this.getRandomVerb(this.verb);
                 }
             }
+
             if (this.verb) {
-                this.newTime();
                 this.renderNew();
             }
         },
