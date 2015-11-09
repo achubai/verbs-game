@@ -3,17 +3,39 @@
  */
 
 var express = require('express');
+var cookieParser = require('cookie-parser');
 var http = require('http');
 var path    = require("path");
 var mongo = require('mongodb');
 var morgan = require('morgan');
 var mongoose = require('mongoose');
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
+var passport = require('./auth');
 var router = express.Router();
 var bodyParser = require('body-parser');
-
+var exports = module.exports = {};
+var db;
 var Schema = mongoose.Schema;
+var verbSchema;
+var Verb;
 
-mongoose.connect('localhost:27017/verbs');
+var app = express();
+
+app.use(express.static(__dirname + '/public'));
+app.set('db-uri', 'mongodb://localhost/verbs');
+
+db = mongoose.connect(app.set('db-uri'));
+
+verbSchema = new Schema({
+    v1: String,
+    v2: String,
+    v3: String,
+    ing: String,
+    translate: String
+}, {collection: 'verbs'});
+
+Verb = mongoose.model('Verb', verbSchema, 'verbs');
 
 mongoose.connection.on('connected', function () {
     console.log('connected to verbs');
@@ -23,32 +45,20 @@ mongoose.connection.on('error',function (err) {
     console.log('Mongoose verbs connection error: ' + err);
 });
 
-var verbSchema = new Schema({
-    id: Number,
-    v1: String,
-    v2: String,
-    v3: String,
-    ing: String,
-    translate: String
-}, {collection: 'verbs'});
-
-var Verb = mongoose.model('Verb', verbSchema, 'verbs');
-
-var app = express();
-
-app.use(express.static(__dirname + '/public'));
-
 app.use(morgan('dev'));
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-var exports = module.exports = {};
-
-exports.index = function (req, res) {
-    res.render('index.html');
-};
-
-router.route('/', router.index);
+app.use(session({
+    secret: 'some secret',
+    saveUninitialized: true,
+    resave: true,
+    store: new MongoStore({
+        mongooseConnection: mongoose.connection
+    })
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 router.route('/verbs')
     .post(function(req, res) {
@@ -69,6 +79,11 @@ router.route('/verbs')
         });
     })
     .get(function(req, res) {
+
+        console.log(req.cookies);
+        console.log('===================');
+        console.log(req.session);
+
         Verb.find(function(err, verbs) {
             if (err)
                 res.send(err);
