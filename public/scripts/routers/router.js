@@ -7,8 +7,9 @@ define([
     '../collections/verbs',
     '../views/all-verbs-list',
     '../views/verb-item-edit',
-    '../views/home'
-],function (Backbone, VerbsCollection, AllVerbsView, VerbItemEditView, HomeView) {
+    '../views/home',
+    '../views/main-menu'
+],function (Backbone, VerbsCollection, AllVerbsView, VerbItemEditView, HomeView, MainMenuView) {
     var Router = Backbone.Router.extend({
         routes: {
             '': 'index',
@@ -19,12 +20,16 @@ define([
         initialize: function () {
             this.collection = new VerbsCollection();
 
-            this.listenToOnce(this.collection, 'collectionFetched', this.started);
+            this.listenToOnce(this.collection, 'verbsCollectionFetched', this.started);
         },
         started: function () {
             this.allVerbsView = new AllVerbsView({collection: this.collection});
             this.homeView = new HomeView({collection: this.collection});
+            this.mainMenuView = new MainMenuView();
+
             Backbone.history.start();
+
+            this.listenTo(this, 'route', this.getRout);
         },
         index: function () {
             this.hideAllTabs();
@@ -50,6 +55,11 @@ define([
         },
         hideAllTabs: function () {
             $('.verbs-tab-block').hide();
+        },
+        getRout: function () {
+            var currentRout = Backbone.history.getFragment();
+
+            this.mainMenuView.setActiveClass();
         }
     });
 

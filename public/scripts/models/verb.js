@@ -9,11 +9,11 @@ define([
     return Backbone.Model.extend({
         idAttribute: '_id',
         default: {
-            v1 : 'begin',
-            v2 : 'began',
-            v3 : 'begun',
-            ing : 'beginning',
-            translate : '????????'
+            v1 : '',
+            v2 : '',
+            v3 : '',
+            ing : '',
+            translate : ''
         }
     });
 

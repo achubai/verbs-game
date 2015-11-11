@@ -7,14 +7,14 @@ define([
     '../models/verb'
 ], function (Backbone, VerbModel) {
 
-    var VerbsCollection = Backbone.Collection.extend({
+    return Backbone.Collection.extend({
         model: VerbModel,
         url: '/api/verbs',
         initialize: function () {
             var that = this;
 
             this.fetch().done(function () {
-                that.trigger('collectionFetched', that);
+                that.trigger('verbsCollectionFetched', that);
             });
         },
         getVerbsArray: function (allRandom, gameLength) {
@@ -57,5 +57,4 @@ define([
         }
     });
 
-    return VerbsCollection;
-})
+});

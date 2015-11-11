@@ -25,17 +25,74 @@
             <div class="progress-bar" style="width: 0%;"></div>
         </div>
         <div class="b-header container">
-            <a href="#verbs/create" class="btn btn-success pull-right">Add verb</a>
-            <ul class="nav nav-pills">
-                <li role="presentation" class="active"><a href="#">Home</a></li>
-                <li role="presentation"><a href="#verbs">Verbs</a></li>
-            </ul>
         </div>
 
-        <div class="container b-verbs-container"></div>
+        <div class="container b-verbs-container">
+            
+            
+        </div>
     </div>
 
+
     <script data-main="scripts/main" src="scripts/libs/require.js"></script>
+
+    <script type="text/template" id="verbs-list-template">
+        <div class="b-verbs-list verbs-tab-block">
+            <a href="#verbs/create" class="btn btn-success">Add verb</a>
+            <table class="b-verbs-table table">
+                <thead>
+                    <tr>
+                        <th>v1</th>
+                        <th>v2</th>
+                        <th>v3</th>
+                        <th>translate</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </script>
+    
+    <script type="text/template" id="main-menu-template">
+        <% 
+            if (auth) {
+                if (admin) {
+         %>
+            <div class="b-auth">
+                <a class="btn btn-default" href="#users/id">
+                    <i class="glyphicon glyphicon-user"></i>
+                    Admin
+                </a>
+                <a class="btn btn-danger" href="#users/id">Log out</a>
+            </div>
+            <ul class="nav nav-pills">
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="#verbs">Verbs</a></li>
+                <li><a href="#users">Users</a></li>
+                <li><a href="#statistic">Statistic</a></li>
+            </ul>
+            <% } else { %>
+                <div class="b-auth">
+                    <a class="btn btn-default" href="#users/id">
+                        <i class="glyphicon glyphicon-user"></i>
+                        User
+                    </a>
+                    <a class="btn btn-danger" href="#users/id">Log out</a>
+                </div>
+                <ul class="nav nav-pills">
+                    <li class="active"><a href="#">Home</a></li>
+                </ul>
+            <% } %>
+        <% } else { %>
+            <div class="b-auth">
+                <a class="btn btn-success" href="#join">Sign up</a>
+                <a class="btn btn-default" href="#login">
+                    <i class="glyphicon glyphicon-user"></i>
+                    Sign in
+                </a>
+            </div>
+        <% } %>
+    </script>
 <!-- <td><%= ing %></td> -->
     <script type="text/template" id="verbs-item">
         <td><%= v1 %></td>

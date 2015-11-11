@@ -64,3 +64,8 @@
 	margin-bottom: 10px;
 	display: none;
 }
+
+.b-auth {
+	padding-top: 3px;
+	float: right;
+}

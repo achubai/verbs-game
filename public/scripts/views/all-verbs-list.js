@@ -13,27 +13,30 @@ define([
 ], function ($, _, Backbone, AllVerbsItem, VerbItemEditView, VerbModel) {
 
     return Backbone.View.extend({
-        tagName: 'table',
-        className: 'b-verbs-table table verbs-tab-block',
+        tagName: 'tbody',
+        template: _.template($('#verbs-list-template').html()),
         initialize: function () {
 
         },
         render: function () {
 
 
-            if(!$('.b-verbs-table').length) {
+            if(!$('.b-verbs-list').length) {
 
                 var that = this;
+                $('.b-verbs-container').append(this.template());
+
                 this.collection.each(function (el) {
                     var item = new AllVerbsItem({model: el});
 
                     that.$el.append(item.el);
                 });
-                $('.b-verbs-container').append(this.$el);
+
+                $('.b-verbs-container').find('.b-verbs-table').append(this.$el)
 
                 return this;
             } else {
-                this.$el.show();
+                this.$el.parents('.b-verbs-list').show();
             }
 
         },

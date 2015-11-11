@@ -4,22 +4,41 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 
-passport.use(new LocalStrategy(
-    function (username, password, done) {
-        if(password == 'admin') {
-            return done(null, {username: 'admin'});
-        }
+passport.use('local-signup', new LocalStrategy({
+        username: 'username',
+        password: 'password'
+    },
+    function(req, username, password, done) {
+        User.findOne({ username: username }, function(err, user) {
+            if (err) { return done(err); }
 
-        return done(null, false);
+            if (user) {
+                return done(null, false, { message: 'this username is busy.' });
+            } else {
+                var newUser = new User();
+                newUser.username = username;
+                newUser.password = password;
+
+                newUser.save(function(err) {
+                    if (err)
+                        res.send(err);
+
+                    done(null, newUser);
+                });
+            }
+
+        });
     }
 ));
 
 passport.serializeUser(function (user, done) {
-    done(null, user.user.username);
+    done(null, user.id);
 });
 
-passport.deserializeUser(function (username, done) {
-    done(null, {username: username});
+passport.deserializeUser(function (id, done) {
+    User.findById(id, function(err, user){
+        done(err, user);
+    });
 });
 
 module.exports = passport;

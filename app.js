@@ -15,27 +15,34 @@ var passport = require('./auth');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var exports = module.exports = {};
-var db;
 var Schema = mongoose.Schema;
-var verbSchema;
-var Verb;
 
 var app = express();
 
 app.use(express.static(__dirname + '/public'));
 app.set('db-uri', 'mongodb://localhost/verbs');
 
-db = mongoose.connect(app.set('db-uri'));
+var db = mongoose.connect(app.set('db-uri'));
 
-verbSchema = new Schema({
+var verbSchema = new Schema({
     v1: String,
     v2: String,
     v3: String,
     ing: String,
     translate: String
-}, {collection: 'verbs'});
+}
+    //, {collection: 'verbs'}
+);
 
-Verb = mongoose.model('Verb', verbSchema, 'verbs');
+var userSchema = new Schema({
+    username: String,
+    password: String
+}
+    //, {collection: 'users'}
+);
+
+var Verb = mongoose.model('Verb', verbSchema, 'verbs');
+var User = mongoose.model('User', userSchema, 'users');
 
 mongoose.connection.on('connected', function () {
     console.log('connected to verbs');
@@ -79,11 +86,6 @@ router.route('/verbs')
         });
     })
     .get(function(req, res) {
-
-        console.log(req.cookies);
-        console.log('===================');
-        console.log(req.session);
-
         Verb.find(function(err, verbs) {
             if (err)
                 res.send(err);
@@ -128,6 +130,34 @@ router.route('/verbs/:id')
             res.json({ message: 'Successfully deleted' });
         })
     });
+
+
+router.route('/users')
+    .get(function (req, res) {
+        User.find(function (err, user) {
+            if(err)
+                res.send(err);
+
+            res.json(user);
+        });
+    });
+
+router.route('/users/:id')
+    .delete(function (req, res) {
+        User.remove({
+            _id: req.params.id
+        }, function (err, user) {
+            if (err)
+                res.send(err);
+
+            res.json({ message: 'User deleted' });
+        });
+    });
+
+router.route('/signup', passport.authenticate('local-signup'),{
+    successRedirect: '/',
+    failureRedirect: '/'
+});
 
 app.use('/api', router);
 app.listen(3000);
