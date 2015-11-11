@@ -19,7 +19,6 @@ define([
             this.render();
         },
         render: function () {
-
             var model =  {
                 auth: this.auth,
                 admin: this.admin
@@ -27,10 +26,22 @@ define([
 
             this.$el.html(this.template(model));
 
+            this.$nav = this.$el.find('.nav');
+
             return true;
         },
         setActiveClass: function (route) {
-            
+            if (this.auth) {
+                this.$nav.find('li').removeClass('active');
+
+                if (route == '') {
+                    console.log('aa');
+                    this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
+                } else {
+                    route = route.substring(0, route.indexOf('/'));
+                    this.$nav.find('a[href*=\"#' + route + '\"]').parents('li').addClass('active');
+                }
+            }
         }
     });
 

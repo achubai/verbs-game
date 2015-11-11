@@ -30,6 +30,7 @@ define([
             Backbone.history.start();
 
             this.listenTo(this, 'route', this.getRout);
+            this.getRout();
         },
         index: function () {
             this.hideAllTabs();
@@ -57,9 +58,7 @@ define([
             $('.verbs-tab-block').hide();
         },
         getRout: function () {
-            var currentRout = Backbone.history.getFragment();
-
-            this.mainMenuView.setActiveClass();
+            this.mainMenuView.setActiveClass(Backbone.history.getFragment());
         }
     });
 
