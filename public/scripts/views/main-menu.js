@@ -13,7 +13,7 @@ define([
         el: '.b-header.container',
         template: _.template($('#main-menu-template').html()),
         initialize: function () {
-            this.auth = true;
+            this.auth = false;
             this.admin = true;
 
             this.render();
@@ -27,6 +27,7 @@ define([
             this.$el.html(this.template(model));
 
             this.$nav = this.$el.find('.nav');
+            this.$join = this.$el.find('a[href=#join]');
 
             return true;
         },
@@ -39,7 +40,7 @@ define([
                     this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
                 } else {
                     route = route.substring(0, route.indexOf('/'));
-                    this.$nav.find('a[href*=\"#' + route + '\"]').parents('li').addClass('active');
+                    this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
                 }
             }
         }
