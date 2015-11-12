@@ -69,3 +69,23 @@
 	padding-top: 3px;
 	float: right;
 }
+
+.b-auth-form {}
+.b-auth-form .form-group {}
+.b-auth-form .form-group .glyphicon {
+	display: none;
+}
+.b-auth-form .form-group .help-block {
+	display: none;
+}
+
+.b-auth-form .form-group.has-success .glyphicon-ok {
+	display: block;
+}
+
+.b-auth-form .form-group.has-error .glyphicon-remove {
+	display: block;
+}
+.b-auth-form .form-group.has-error .help-block {
+	display: block;
+}

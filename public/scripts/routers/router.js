@@ -8,14 +8,25 @@ define([
     '../views/all-verbs-list',
     '../views/verb-item-edit',
     '../views/home',
-    '../views/main-menu'
-],function (Backbone, VerbsCollection, AllVerbsView, VerbItemEditView, HomeView, MainMenuView) {
+    '../views/main-menu',
+    '../views/join'
+],function (
+    Backbone,
+    VerbsCollection,
+    AllVerbsView,
+    VerbItemEditView,
+    HomeView,
+    MainMenuView,
+    JoinView
+
+) {
     var Router = Backbone.Router.extend({
         routes: {
             '': 'index',
             'verbs': 'allVerbs',
             'verbs/edit/:id': 'editVerb',
-            'verbs/create': 'createVerb'
+            'verbs/create': 'createVerb',
+            'join': 'join'
         },
         initialize: function () {
             this.collection = new VerbsCollection();
@@ -26,6 +37,7 @@ define([
             this.allVerbsView = new AllVerbsView({collection: this.collection});
             this.homeView = new HomeView({collection: this.collection});
             this.mainMenuView = new MainMenuView();
+            this.joinView = new JoinView();
 
             Backbone.history.start();
 
@@ -59,6 +71,12 @@ define([
         },
         getRout: function () {
             this.mainMenuView.setActiveClass(Backbone.history.getFragment());
+        },
+        join: function () {
+            this.joinView.render();
+        },
+        login: function () {
+            this.joinView.render();
         }
     });
 
