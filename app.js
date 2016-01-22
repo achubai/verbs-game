@@ -9,8 +9,7 @@ var path    = require("path");
 var mongo = require('mongodb');
 var morgan = require('morgan');
 var mongoose = require('mongoose');
-var session = require('express-session');
-var MongoStore = require('connect-mongo')(session);
+var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var passport = require('./auth');
 var router = express.Router();
 var bodyParser = require('body-parser');
@@ -22,7 +21,7 @@ var app = express();
 app.use(express.static(__dirname + '/public'));
 app.set('db-uri', 'mongodb://localhost/verbs');
 
-var db = mongoose.connect(app.set('db-uri'));
+mongoose.connect(app.set('db-uri'));
 
 var verbSchema = new Schema({
     v1: String,
@@ -35,8 +34,11 @@ var verbSchema = new Schema({
 );
 
 var userSchema = new Schema({
+    email: String,
     username: String,
-    password: String
+    password: String,
+    permission: String
+
 }
     //, {collection: 'users'}
 );
@@ -56,16 +58,9 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(session({
-    secret: 'some secret',
-    saveUninitialized: true,
-    resave: true,
-    store: new MongoStore({
-        mongooseConnection: mongoose.connection
-    })
-}));
+
 app.use(passport.initialize());
-app.use(passport.session());
+
 
 router.route('/verbs')
     .post(function(req, res) {
@@ -133,12 +128,29 @@ router.route('/verbs/:id')
 
 
 router.route('/users')
+    // remove get after development
     .get(function (req, res) {
         User.find(function (err, user) {
             if(err)
                 res.send(err);
 
             res.json(user);
+        });
+    })
+    .post(function(req, res) {
+
+        var user = new User();
+        console.log(req.body);
+        user.email = req.body.email;
+        user.username = req.body.username;
+        user.password = req.body.password;
+        user.permission = 'user';
+
+        user.save(function(err, mod) {
+            if (err)
+                res.send(err);
+
+            res.json({ message: 'New user!', id: mod._id, email: mod.email,name: mod.username });
         });
     });
 
@@ -154,10 +166,28 @@ router.route('/users/:id')
         });
     });
 
-router.route('/signup', passport.authenticate('local-signup'),{
-    successRedirect: '/',
-    failureRedirect: '/'
-});
+router.route('/signin')
+    .post(function (req, res) {
+        User.findOne({username: req.body.username}, function (err, user){
+
+            if (err) res.send(err);
+
+            if(!user) {
+                res.json({ success: false, err: 'user', message: 'User not found.' });
+            } else if (user) {
+                if (user.password !== req.body.password) {
+                    res.json({ success: false, err: 'password', message: 'Wrong password.' });
+                } else {
+                    res.json({
+                        success: true,
+                        message: 'wooohooo!',
+                        permission: user.permission
+                    });
+                }
+            }
+        });
+    });
+
 
 app.use('/api', router);
 app.listen(3000);

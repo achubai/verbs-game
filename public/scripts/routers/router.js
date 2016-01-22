@@ -9,7 +9,9 @@ define([
     '../views/verb-item-edit',
     '../views/home',
     '../views/main-menu',
-    '../views/join'
+    '../views/join',
+    '../views/signin',
+    '../models/user'
 ],function (
     Backbone,
     VerbsCollection,
@@ -17,7 +19,9 @@ define([
     VerbItemEditView,
     HomeView,
     MainMenuView,
-    JoinView
+    JoinView,
+    SigninView,
+    UserModel
 
 ) {
     var Router = Backbone.Router.extend({
@@ -26,7 +30,8 @@ define([
             'verbs': 'allVerbs',
             'verbs/edit/:id': 'editVerb',
             'verbs/create': 'createVerb',
-            'join': 'join'
+            'join': 'join',
+            'signin': 'signin'
         },
         initialize: function () {
             this.collection = new VerbsCollection();
@@ -37,7 +42,8 @@ define([
             this.allVerbsView = new AllVerbsView({collection: this.collection});
             this.homeView = new HomeView({collection: this.collection});
             this.mainMenuView = new MainMenuView();
-            this.joinView = new JoinView();
+            this.joinView = new JoinView({model: new UserModel});
+            this.signinView = new SigninView();
 
             Backbone.history.start();
 
@@ -75,8 +81,8 @@ define([
         join: function () {
             this.joinView.render();
         },
-        login: function () {
-            this.joinView.render();
+        signin: function () {
+            this.signinView.render();
         }
     });
 

@@ -23,7 +23,14 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="auth-modal"  data-backdrop="static">
+    <div class="modal fade" id="join-modal"  data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="signin-modal"  data-backdrop="static">
         <div class="modal-dialog modal-sm">
             <div class="modal-content"></div>
         </div>
@@ -59,63 +66,67 @@
 
     <script type="text/template" id="join-template">
         <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title">Join</h4>
         </div>
-        <div class="modal-body b-auth-form">
-            <div class="form-group has-feedback">
-                <label class="control-label" for="join-email">Email</label>
-                <input type="text" class="form-control" id="join-email" name="email">
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-                <span class="help-block">This username is busy</span>
-            </div>
-            <div class="form-group has-feedback">
-                <label class="control-label" for="join-name">Username</label>
-                <input type="text" class="form-control" id="join-name" name="username">
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-                <span class="help-block">This username is busy</span>
-            </div>
-            <div class="form-group has-feedback">
-                <label class="control-label" for="join-pass">Password</label>
-                <input type="password" class="form-control" id="join-pass" name="password">
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-                <span class="help-block">The password is too short</span>
-            </div>
-            <div class="form-group has-feedback">
-                <label class="control-label" for="join-confirm-pass">Password (Confirm)</label>
-                <input type="password" class="form-control" id="join-confirm-pass">
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-                <span class="help-block">Passwords do not match</span>
-            </div>
-            <button type="submit" class="btn btn-success">Create an account</button>
+        <div class="modal-body">
+            <form id="join-form" class="b-auth-form">
+                <div class="form-group has-feedback">
+                    <label class="control-label" for="join-email">Email</label>
+                    <input type="text" class="form-control" id="join-email" name="email">
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                    <span class="help-block">Please fill email</span>
+                </div>
+                <div class="form-group has-feedback">
+                    <label class="control-label" for="join-name">Username</label>
+                    <input type="text" class="form-control" id="join-name" name="username">
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                    <span class="help-block">Please fill username</span>
+                </div>
+                <div class="form-group has-feedback">
+                    <label class="control-label" for="join-pass">Password</label>
+                    <input type="password" class="form-control" id="join-pass" name="password">
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                    <span class="help-block">The password is too short</span>
+                </div>
+                <div class="form-group has-feedback">
+                    <label class="control-label" for="join-confirm-pass">Password (Confirm)</label>
+                    <input type="password" class="form-control" id="join-confirm-pass">
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                    <span class="help-block">Passwords do not match</span>
+                </div>
+                <button type="submit" class="btn btn-success">Create an account</button>
+            </form>
         </div>
     </script>
 
     <script type="text/template" id="signin-template">
         <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title">Join</h4>
         </div>
-        <div class="modal-body b-auth-form">
-            <div class="form-group has-feedback">
-                <label class="control-label" for="join-name">Username</label>
-                <input type="text" class="form-control" id="join-name" name="username">
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-                <span class="help-block">This username is busy</span>
-            </div>
-            <div class="form-group has-feedback">
-                <label class="control-label" for="join-pass">Password <a href="#">(forgot password)</a></label>
-                <input type="password" class="form-control" id="join-pass" name="password">
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-                <span class="help-block">The password is too short</span>
-            </div>
-            <button type="submit" class="btn btn-success">Sign in</button>
+        <div class="modal-body">
+            <form id="signin-form" class="b-auth-form">
+                <div class="form-group has-feedback">
+                    <label class="control-label" for="signin-name">Username</label>
+                    <input type="text" class="form-control" id="signin-name" name="username">
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                    <span class="help-block">Insert username</span>
+                </div>
+                <div class="form-group has-feedback">
+                    <label class="control-label" for="signin-pass">Password <a href="#">(forgot password)</a></label>
+                    <input type="password" class="form-control" id="signin-pass" name="password">
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                    <span class="help-block">Insert password</span>
+                </div>
+                <button type="submit" class="btn btn-success">Sign in</button>
+            </form>
         </div>
     </script>
     
@@ -152,14 +163,14 @@
         <% } else { %>
             <div class="b-auth">
                 <a class="btn btn-success" href="#join">Sign up</a>
-                <a class="btn btn-default" href="#login">
+                <a class="btn btn-default" href="#signin">
                     <i class="glyphicon glyphicon-user"></i>
                     Sign in
                 </a>
             </div>
         <% } %>
     </script>
-<!-- <td><%= ing %></td> -->
+
     <script type="text/template" id="verbs-item">
         <td><%= v1 %></td>
         <td><%= v2 %></td>
