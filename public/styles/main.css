@@ -89,3 +89,26 @@
 .b-auth-form .form-group.has-error .help-block {
 	display: block;
 }
+
+.b-profile-container {
+
+}
+
+.b-profile-side {
+	width: 250px;
+	float: left;
+}
+.b-profile-side .profile-ava {
+	margin-bottom: 20px;
+}
+.b-profile-side .profile-ava img {
+	max-width: 100%;
+}
+
+.b-profile-main {
+	margin-left: 280px;
+	overflow: hidden;
+}
+.b-profile-main .nav-tabs {
+	margin-bottom: 15px;
+}

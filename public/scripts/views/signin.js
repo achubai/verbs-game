@@ -51,6 +51,7 @@ define([
                             that.close();
 
                             that.trigger('reRenderMenu', that);
+                            that.trigger('reRenderVerbsList', that);
                         }
                     }
                 });

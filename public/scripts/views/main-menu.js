@@ -68,6 +68,7 @@ define([
                     localStorage.removeItem('verbsUserData');
 
                     that.trigger('reRenderMenu', that);
+                    that.trigger('reRenderVerbsList', that);
                 }
 
             })

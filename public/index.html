@@ -39,6 +39,7 @@
         </div>
         <div class="b-header container"></div>
         <div class="container b-verbs-container"></div>
+        <div class="container b-profile-container"></div>
     </div>
 
 
@@ -65,6 +66,51 @@
                 </thead>
             </table>
         </div>
+    </script>
+
+    <script type="text/template" id="profile-template">
+        <aside class="b-profile-side">
+            <div class="profile-ava">
+                <img src="images/profile-icon.png" alt=""/>
+            </div>
+        </aside>
+        <main class="b-profile-main">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation"><a href="#user-statistics" aria-controls="home" role="tab" data-toggle="tab">Statistics</a></li>
+                <li role="presentation" class="active"><a href="#user-data" aria-controls="home" role="tab" data-toggle="tab" href="">Data</a></li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane" id="user-statistics">Soon:)</div>
+                <div role="tabpanel" class="tab-pane active" id="user-data">
+
+                    <form class="col-sm-8">
+                        <div class="form-group">
+                            <label for="" class="">Email</label>
+                            <input type="email" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="">Username</label>
+                            <input type="text" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="">Old password</label>
+                            <input type="password" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="">New password</label>
+                            <input type="password" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="">New password (Confirm)</label>
+                            <input type="password" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
     </script>
 
     <script type="text/template" id="join-template">
@@ -139,11 +185,11 @@
                 if (admin) {
         %>
             <div class="b-auth">
-                <a class="btn btn-default" href="#users/id">
+                <a class="btn btn-default" href="#profile">
                     <i class="glyphicon glyphicon-user"></i>
                     Admin
                 </a>
-                <a class="btn btn-danger btn-logout" href="#/">Log out</a>
+                <a class="btn btn-danger btn-logout" href="">Log out</a>
             </div>
             <ul class="nav nav-pills">
                 <li class="active"><a href="#">Home</a></li>
@@ -153,11 +199,11 @@
             </ul>
             <% } else { %>
                 <div class="b-auth">
-                    <a class="btn btn-default" href="#users/id">
+                    <a class="btn btn-default" href="#profile">
                         <i class="glyphicon glyphicon-user"></i>
                         User
                     </a>
-                    <a class="btn btn-danger btn-logout" href="#/">Log out</a>
+                    <a class="btn btn-danger btn-logout" href="">Log out</a>
                 </div>
                 <ul class="nav nav-pills">
                     <li class="active"><a href="#">Home</a></li>

@@ -50,6 +50,7 @@ define([
                 this.$el.parents('.b-verbs-list').show();
             }
 
+
         },
         renderOne: function (el) {
             var item = new AllVerbsItem({model: el});
@@ -78,6 +79,11 @@ define([
 
             this.stopListening(this.verbItemEditView);
             this.verbItemEditView = undefined;
+        },
+        reRender: function () {
+            this.$el.parents('.b-verbs-container').html('');
+            this.$el.html('');
+            this.render();
         }
     });
 

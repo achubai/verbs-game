@@ -21,13 +21,10 @@ define([
         },
         render: function () {
             var admin = JSON.parse(localStorage.getItem('verbsUserData')) ? JSON.parse(localStorage.getItem('verbsUserData')).permission : 'user' ;
-            var model = this.model.toJSON();
 
-            this.model = _.extend(model, {
-               admin: admin
-            });
-
-            this.$el.html(this.template(this.model));
+            this.$el.html(this.template(_.extend(this.model.toJSON(), {
+                admin: admin
+            })));
 
             return this;
         },

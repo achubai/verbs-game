@@ -11,7 +11,8 @@ define([
     '../views/main-menu',
     '../views/join',
     '../views/signin',
-    '../models/user'
+    '../models/user',
+    '../views/profile'
 ],function (
     Backbone,
     VerbsCollection,
@@ -21,7 +22,8 @@ define([
     MainMenuView,
     JoinView,
     SigninView,
-    UserModel
+    UserModel,
+    ProfileModel
 
 ) {
     var Router = Backbone.Router.extend({
@@ -31,7 +33,8 @@ define([
             'verbs/edit/:id': 'editVerb',
             'verbs/create': 'createVerb',
             'join': 'join',
-            'signin': 'signin'
+            'signin': 'signin',
+            'profile': 'profile'
         },
         checkPermission: function() {
             var adminUrls = [
@@ -80,6 +83,7 @@ define([
             this.mainMenuView = new MainMenuView();
             this.joinView = new JoinView({model: new UserModel});
             this.signinView = new SigninView();
+            this.profileView = new ProfileModel();
 
             Backbone.history.start();
 
@@ -87,7 +91,10 @@ define([
             this.getRout();
 
             this.listenTo(this.signinView, 'reRenderMenu', this.mainMenuReRender);
+            this.listenTo(this.signinView, 'reRenderVerbsList', this.allVerbsRender);
+
             this.listenTo(this.mainMenuView, 'reRenderMenu', this.mainMenuReRender);
+            this.listenTo(this.mainMenuView, 'reRenderVerbsList', this.allVerbsRender);
         },
 
         // routers
@@ -122,9 +129,12 @@ define([
             this.joinView.render();
         },
         signin: function () {
-            console.log('a');
             this.signinView.render();
         },
+        profile: function () {
+            //this.profileView.render();
+        },
+
 
         // helpers
         hideAllTabs: function () {
@@ -135,6 +145,10 @@ define([
         },
         mainMenuReRender: function () {
             this.mainMenuView.render();
+        },
+        allVerbsRender: function () {
+            this.hideAllTabs();
+            this.allVerbsView.reRender();
         }
     });
 
@@ -145,15 +159,7 @@ define([
             if(userData) {
                 xhr.setRequestHeader('x-access-user', userData);
             }
-        },
-        //complete: function(data) {
-        //    console.log(data.responseJSON.tokenValid, !data.responseJSON.tokenValid);
-        //    if (data.responseJSON.tokenValid) {
-        //        if (!data.responseJSON.tokenValid) {
-        //
-        //        }
-        //    }
-        //}
+        }
     });
 
 
