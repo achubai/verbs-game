@@ -12,19 +12,34 @@ define([
 
         el: '.b-header.container',
         template: _.template($('#main-menu-template').html()),
+        events: {
+            'click .btn-logout': 'logout'
+        },
         initialize: function () {
-            this.auth = false;
-            this.admin = true;
-
             this.render();
         },
         render: function () {
-            var model =  {
+            this.userData = localStorage.getItem('verbsUserData');
+
+            if (this.userData) {
+                var data = JSON.parse(this.userData);
+
+                if(data.permission === "admin") {
+                    this.auth = true;
+                    this.admin = true;
+                } else {
+                    this.auth = true;
+                    this.admin = false;
+                }
+            } else {
+                this.auth = false;
+                this.admin = false;
+            }
+
+            this.$el.html(this.template({
                 auth: this.auth,
                 admin: this.admin
-            };
-
-            this.$el.html(this.template(model));
+            }));
 
             this.$nav = this.$el.find('.nav');
             this.$join = this.$el.find('a[href=#join]');
@@ -36,13 +51,26 @@ define([
                 this.$nav.find('li').removeClass('active');
 
                 if (route == '') {
-                    console.log('aa');
                     this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
                 } else {
                     route = route.substring(0, route.indexOf('/'));
                     this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
                 }
             }
+        },
+        logout: function () {
+            var that = this;
+
+            $.ajax({
+                method: 'POST',
+                url: '/api/logout',
+                success: function (data) {
+                    localStorage.removeItem('verbsUserData');
+
+                    that.trigger('reRenderMenu', that);
+                }
+
+            })
         }
     });
 

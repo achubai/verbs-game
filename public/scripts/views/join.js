@@ -36,6 +36,7 @@ define([
         },
         sendData: function (e) {
             if(this.validate()) {
+                var that = this;
                 var $form = $(e.currentTarget);
 
                 $.ajax({
@@ -44,33 +45,52 @@ define([
                     data: $form.serialize(),
 
                     success: function(data) {
-                        console.log('success');
-                        console.log(JSON.stringify(data));
+                        console.log(data);
+
+                        if (data.err) {
+                            that.validate(data.err, data.message);
+                        }
                     }
                 });
             }
             return false;
         },
-        validate: function () {
+        validate: function (err, message) {
             var that = this;
             this.errors = 0;
 
-            _.each(this.$el.find('.form-control'), function (el){
-                $(el).parents('.form-group').removeClass('has-error');
+            if (err) {
+                var $formLine;
 
-                if($(el).attr('id') != 'join-confirm-pass') {
-                    if ($(el).val() == '') {
-                        $(el).parents('.form-group').addClass('has-error');
+                if (err === 'user') {
+                    $formLine = this.$el.find('#join-name').parents('.form-group');
 
-                        that.errors++;
-                    }
+                    $formLine.addClass('has-error');
+                    $formLine.find('.help-block').text(message);
                 } else {
-                    if($(el).val() != that.$el.find('#join-pass').val()) {
-                        $(el).parents('.form-group').addClass('has-error');
-                        that.errors++;
-                    }
+                    $formLine = this.$el.find('#join-email').parents('.form-group');
+
+                    $formLine.addClass('has-error');
+                    $formLine.find('.help-block').text(message);
                 }
-            });
+            } else {
+                _.each(this.$el.find('.form-control'), function (el) {
+                    $(el).parents('.form-group').removeClass('has-error');
+
+                    if ($(el).attr('id') != 'join-confirm-pass') {
+                        if ($(el).val() == '') {
+                            $(el).parents('.form-group').addClass('has-error');
+
+                            that.errors++;
+                        }
+                    } else {
+                        if ($(el).val() != that.$el.find('#join-pass').val()) {
+                            $(el).parents('.form-group').addClass('has-error');
+                            that.errors++;
+                        }
+                    }
+                });
+            }
 
             return !this.errors;
         }

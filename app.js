@@ -3,18 +3,14 @@
  */
 
 var express = require('express');
-var cookieParser = require('cookie-parser');
-var http = require('http');
-var path    = require("path");
-var mongo = require('mongodb');
-var morgan = require('morgan');
 var mongoose = require('mongoose');
-var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
-var passport = require('./auth');
 var router = express.Router();
 var bodyParser = require('body-parser');
-var exports = module.exports = {};
 var Schema = mongoose.Schema;
+var schedule = require('node-schedule');
+var crypto = require('crypto-js');
+
+var SECRET = 'secret';
 
 var app = express();
 
@@ -43,8 +39,16 @@ var userSchema = new Schema({
     //, {collection: 'users'}
 );
 
+var tokensSchema = new Schema({
+    token: String,
+    valid: Boolean
+}
+    //, {collection: 'users'}
+);
+
 var Verb = mongoose.model('Verb', verbSchema, 'verbs');
 var User = mongoose.model('User', userSchema, 'users');
+var Token = mongoose.model('Token', tokensSchema, 'tokens');
 
 mongoose.connection.on('connected', function () {
     console.log('connected to verbs');
@@ -54,14 +58,117 @@ mongoose.connection.on('error',function (err) {
     console.log('Mongoose verbs connection error: ' + err);
 });
 
-app.use(morgan('dev'));
-app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(passport.initialize());
+
+var userSession = {
+    userId: null,
+    token : null,
+    tokenValid: false,
+    permission: null
+};
 
 
+// not protected
+router.route('/verbs')
+    .get(function(req, res) {
+        Verb.find(function(err, verbs) {
+            if (err)
+                res.send(err);
+
+            res.json(verbs);
+        });
+    });
+
+// not protected
+router.route('/users')
+    //TODO: remove get password after development,
+    .post(checkRegistrationEmailExist,checkRegistrationLoginExist, function(req, res){
+        var user = new User();
+
+        user.email = req.body.email;
+        user.username = req.body.username;
+        user.password = req.body.password;
+        user.permission = 'user';
+
+        user.save(function(err, mod) {
+            if (err)
+                res.send(err);
+
+            res.json({ message: 'New user!', id: mod._id, email: mod.email,name: mod.username });
+        });
+    });
+
+// not protected
+router.route('/signin')
+    .post(function (req, res) {
+        User.findOne({
+            username: req.body.username
+        }, function (err, user){
+
+            if (err) res.send(err);
+
+            if(!user) {
+
+                res.json({
+                    success: false,
+                    err: 'user',
+                    message: 'User not found.'
+                });
+
+            } else if (user) {
+                if (user.password !== req.body.password) {
+
+                    res.json({
+                        success: false,
+                        err: 'password',
+                        message: 'Wrong password.'
+                    });
+
+                } else {
+
+                    var tokenData = {
+                        id: user._id,
+                        permission: user.permission,
+                        time: (new Date()).getTime()
+                    };
+
+                    var token = (crypto.AES.encrypt(JSON.stringify(tokenData), SECRET)).toString();
+
+                    res.json({
+                        token: token,
+                        permission: user.permission
+                    });
+
+                    saveToken(token, res);
+                }
+            }
+        });
+    });
+
+// not protected
+router.route('/logout')
+    .post(function(req, res) {
+        var userData = JSON.parse(req.headers['x-access-user']);
+
+        Token.findOne({token: userData.token}, function (err, token) {
+            if (err) {
+                res.send(err)
+            } else {
+                token.valid = false;
+
+                res.json({
+                    success: false,
+                    message: 'Logout'
+                })
+            }
+        })
+    });
+
+router.use(verifyToken, checkPermissions);
+
+// protected
 router.route('/verbs')
     .post(function(req, res) {
 
@@ -79,16 +186,9 @@ router.route('/verbs')
 
             res.json({ message: 'Verb created!', id: mod._id });
         });
-    })
-    .get(function(req, res) {
-        Verb.find(function(err, verbs) {
-            if (err)
-                res.send(err);
-
-            res.json(verbs);
-        });
     });
 
+// protected
 router.route('/verbs/:id')
     .put(function (req, res) {
         Verb.findById(req.params.id, function(err, verb){
@@ -126,9 +226,8 @@ router.route('/verbs/:id')
         })
     });
 
-
+// protected
 router.route('/users')
-    // remove get after development
     .get(function (req, res) {
         User.find(function (err, user) {
             if(err)
@@ -136,57 +235,153 @@ router.route('/users')
 
             res.json(user);
         });
-    })
-    .post(function(req, res) {
-
-        var user = new User();
-        console.log(req.body);
-        user.email = req.body.email;
-        user.username = req.body.username;
-        user.password = req.body.password;
-        user.permission = 'user';
-
-        user.save(function(err, mod) {
-            if (err)
-                res.send(err);
-
-            res.json({ message: 'New user!', id: mod._id, email: mod.email,name: mod.username });
-        });
     });
 
+// protected
 router.route('/users/:id')
     .delete(function (req, res) {
         User.remove({
             _id: req.params.id
         }, function (err, user) {
-            if (err)
+            if (err) {
                 res.send(err);
-
-            res.json({ message: 'User deleted' });
-        });
-    });
-
-router.route('/signin')
-    .post(function (req, res) {
-        User.findOne({username: req.body.username}, function (err, user){
-
-            if (err) res.send(err);
-
-            if(!user) {
-                res.json({ success: false, err: 'user', message: 'User not found.' });
-            } else if (user) {
-                if (user.password !== req.body.password) {
-                    res.json({ success: false, err: 'password', message: 'Wrong password.' });
-                } else {
-                    res.json({
-                        success: true,
-                        message: 'wooohooo!',
-                        permission: user.permission
-                    });
-                }
+            } else {
+                res.json({ message: 'User deleted' });
             }
         });
     });
+
+router.route('/verifyUser')
+    .post(function(req, res){
+        res.json({
+            tokenValid: true,
+            admin: true
+        })
+    });
+
+
+// middlewares
+
+function saveToken (data, res) {
+    var token = new Token();
+
+    token.token = data;
+    token.valid = true;
+
+    token.save(function(err){
+        if(err) res.send(err)
+    })
+}
+
+function decryptToken (token) {
+
+    var bytes  = crypto.AES.decrypt(token, SECRET);
+    return  JSON.parse(bytes.toString(crypto.enc.Utf8));
+}
+
+
+function verifyToken (req, res, next){
+
+    var userData = {};
+
+    if (req.headers['x-access-user']) {
+        userData = JSON.parse(req.headers['x-access-user']);
+    }
+
+    if(userData.token) {
+        Token.findOne({'token': userData.token}, function(err, token) {
+            if (err) {
+                res.send(err);
+            } else {
+                if (token) {
+                    if (token.valid) {
+                        userSession.token = token.token;
+                        var data = decryptToken(token.token);
+
+                        userSession.permission = data.permission;
+                        userSession.tokenValid = true;
+
+                        next();
+                    } else {
+                        res.json({
+                            tokenValid: userSession.tokenValid,
+                            message: 'token outdated!'
+                        })
+                    }
+                } else {
+                    res.json({
+                        tokenValid: userSession.tokenValid,
+                        message: 'No token in db'
+                    })
+                }
+            }
+        })
+    } else {
+        res.json({
+            tokenValid: userSession.tokenValid,
+            message: 'No userToken!'
+        });
+    }
+}
+
+function checkPermissions (req, res, next){
+    if (userSession.permission !== 'user'){
+        next();
+    } else {
+        console.log('No permissions');
+        res.json({
+            success: false,
+            message: 'No permissions'
+        })
+    }
+}
+
+function checkRegistrationEmailExist (req, res, next) {
+    User.findOne({email: req.body.email}, function(err, email) {
+        if(err) res.send(err);
+
+        if (email){
+            res.json({
+                success: false,
+                err: 'email',
+                message: 'Email is busy'
+            });
+        } else {
+            next();
+        }
+    });
+}
+
+function checkRegistrationLoginExist(req, res, next){
+    User.findOne({username: req.body.username}, function(err, user) {
+        if(err) res.send(err);
+
+        if (user){
+            res.json({
+                success: false,
+                err: 'user',
+                message: 'User is busy'
+            })
+        } else {
+            next();
+        }
+    });
+}
+
+
+var rule = new schedule.RecurrenceRule();
+rule.minute = new schedule.Range(0, 0, 59);
+
+schedule.scheduleJob(rule, function(){
+    Token.update({valid: true}, {valid: false}, function(err, token) {
+        if(err) {
+            throw err;
+        } else {
+            userSession.tokenValid = false;
+            console.log('Tokens not actual');
+        }
+    })
+});
 
 
 app.use('/api', router);

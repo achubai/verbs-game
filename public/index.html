@@ -12,9 +12,6 @@
 
 </head>
 <body>
-
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#auth-modal">Small modal</button>
-
     <!-- Modal -->
     <div class="modal fade" id="verb-edit-modal" data-backdrop="static">
         <div class="modal-dialog">
@@ -49,7 +46,13 @@
 
     <script type="text/template" id="verbs-list-template">
         <div class="b-verbs-list verbs-tab-block">
-            <a href="#verbs/create" class="btn btn-success">Add verb</a>
+            <%
+            if (admin) {
+            %>
+                <a href="#verbs/create" class="btn btn-success">Add verb</a>
+            <%
+            }
+            %>
             <table class="b-verbs-table table">
                 <thead>
                     <tr>
@@ -140,7 +143,7 @@
                     <i class="glyphicon glyphicon-user"></i>
                     Admin
                 </a>
-                <a class="btn btn-danger" href="#users/id">Log out</a>
+                <a class="btn btn-danger btn-logout" href="#/">Log out</a>
             </div>
             <ul class="nav nav-pills">
                 <li class="active"><a href="#">Home</a></li>
@@ -154,10 +157,11 @@
                         <i class="glyphicon glyphicon-user"></i>
                         User
                     </a>
-                    <a class="btn btn-danger" href="#users/id">Log out</a>
+                    <a class="btn btn-danger btn-logout" href="#/">Log out</a>
                 </div>
                 <ul class="nav nav-pills">
                     <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#verbs">Verbs</a></li>
                 </ul>
             <% } %>
         <% } else { %>
@@ -168,7 +172,12 @@
                     Sign in
                 </a>
             </div>
+            <ul class="nav nav-pills">
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="#verbs">Verbs</a></li>
+            </ul>
         <% } %>
+
     </script>
 
     <script type="text/template" id="verbs-item">
@@ -176,11 +185,12 @@
         <td><%= v2 %></td>
         <td><%= v3 %></td>
         <td><%= translate %></td>
+
         <td>
-            <% if (typeof(_id)!== 'undefined') {%>
-            <a href="#verbs/edit/<%= _id %>" class="edit"><i class="glyphicon glyphicon-pencil"></i></a>
-            
-            <a href="" class="remove"><i class="glyphicon glyphicon-remove"></i></a>
+            <% if (typeof(_id)!== 'undefined' && admin === 'admin') {%>
+                <a href="#verbs/edit/<%= _id %>" class="edit"><i class="glyphicon glyphicon-pencil"></i></a>
+
+                <a href="" class="remove"><i class="glyphicon glyphicon-remove"></i></a>
             <% } %>
         </td>
 

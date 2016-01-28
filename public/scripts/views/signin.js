@@ -46,20 +46,25 @@ define([
                     success: function(data) {
                         if (data.err) {
                             that.validate(data.err, data.message);
+                        } else {
+                            that.saveUser(data);
+                            that.close();
+
+                            that.trigger('reRenderMenu', that);
                         }
                     }
                 });
             }
             return false;
         },
-        validate: function (error, message) {
+        validate: function (err, message) {
 
             var that = this;
             this.errors = 0;
-            if (error) {
+            if (err) {
                 var $formLine;
 
-                if (error === 'user') {
+                if (err === 'user') {
                     $formLine = this.$el.find('#signin-name').parents('.form-group');
 
                     $formLine.addClass('has-error');
@@ -82,7 +87,9 @@ define([
 
                 return !this.errors;
             }
+        },
+        saveUser: function (data) {
+            localStorage.setItem('verbsUserData', JSON.stringify(data));
         }
-
     });
 });

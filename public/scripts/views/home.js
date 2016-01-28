@@ -55,7 +55,6 @@ define([
             }
 
             if (this.verbs.length != 0) {
-                console.log(this.verbs, this.verbs.length != 0);
                 this.verb = this.verbs[_.random(this.verbs.length - 1)];
                 return this.verb;
             } else {

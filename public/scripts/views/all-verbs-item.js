@@ -20,7 +20,14 @@ define([
             'click .remove': 'deleteModel'
         },
         render: function () {
-            this.$el.html(this.template(this.model.toJSON()));
+            var admin = JSON.parse(localStorage.getItem('verbsUserData')) ? JSON.parse(localStorage.getItem('verbsUserData')).permission : 'user' ;
+            var model = this.model.toJSON();
+
+            this.model = _.extend(model, {
+               admin: admin
+            });
+
+            this.$el.html(this.template(this.model));
 
             return this;
         },

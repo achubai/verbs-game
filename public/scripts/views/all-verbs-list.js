@@ -19,12 +19,23 @@ define([
 
         },
         render: function () {
+            var userData = localStorage.getItem('verbsUserData');
+
+            this.admin = false;
+
+            if (userData) {
+                var data = JSON.parse(userData);
+
+                if (data.permission === "admin") {
+                    this.admin = true;
+                }
+            }
 
 
             if(!$('.b-verbs-list').length) {
 
                 var that = this;
-                $('.b-verbs-container').append(this.template());
+                $('.b-verbs-container').append(this.template({admin: this.admin}));
 
                 this.collection.each(function (el) {
                     var item = new AllVerbsItem({model: el});

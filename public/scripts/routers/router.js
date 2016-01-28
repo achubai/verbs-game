@@ -33,6 +33,42 @@ define([
             'join': 'join',
             'signin': 'signin'
         },
+        checkPermission: function() {
+            var adminUrls = [
+                'verbs/edit/',
+                'verbs/create'
+            ];
+            var url = Backbone.history.getFragment();
+
+            var isAdminProtected = _.find(adminUrls, function(i){
+                return i === url;
+            });
+            var userPermission = 'view'
+
+            if (isAdminProtected) {
+                $.ajax({
+                    method: 'post',
+                    url: 'api/verifyUser',
+                    async: false,
+                    success: function(data) {
+                        if (!data.tokenValid) {
+                            console.log('token not valid');
+                            if (localStorage.getItem('verbsUserData')) {
+                                localStorage.removeItem('verbsUserData');
+                            }
+                        } else {
+                            if (data.admin) {
+                                userPermission = 'admin';
+                            } else {
+                                userPermission = 'user';
+                            }
+                        }
+                    }
+                });
+            }
+
+            return userPermission;
+        },
         initialize: function () {
             this.collection = new VerbsCollection();
 
@@ -49,7 +85,12 @@ define([
 
             this.listenTo(this, 'route', this.getRout);
             this.getRout();
+
+            this.listenTo(this.signinView, 'reRenderMenu', this.mainMenuReRender);
+            this.listenTo(this.mainMenuView, 'reRenderMenu', this.mainMenuReRender);
         },
+
+        // routers
         index: function () {
             this.hideAllTabs();
             this.homeView.render();
@@ -70,21 +111,52 @@ define([
             }
         },
         createVerb: function () {
-            this.allVerbsView.createVerbView();
+            if (this.checkPermission() === 'admin') {
+                this.allVerbsView.createVerbView();
+            } else {
+                console.log(this.checkPermission());
+                window.router.navigate('/signin');
+            }
         },
+        join: function () {
+            this.joinView.render();
+        },
+        signin: function () {
+            console.log('a');
+            this.signinView.render();
+        },
+
+        // helpers
         hideAllTabs: function () {
             $('.verbs-tab-block').hide();
         },
         getRout: function () {
             this.mainMenuView.setActiveClass(Backbone.history.getFragment());
         },
-        join: function () {
-            this.joinView.render();
-        },
-        signin: function () {
-            this.signinView.render();
+        mainMenuReRender: function () {
+            this.mainMenuView.render();
         }
     });
+
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            var userData = localStorage.getItem('verbsUserData');
+
+            if(userData) {
+                xhr.setRequestHeader('x-access-user', userData);
+            }
+        },
+        //complete: function(data) {
+        //    console.log(data.responseJSON.tokenValid, !data.responseJSON.tokenValid);
+        //    if (data.responseJSON.tokenValid) {
+        //        if (!data.responseJSON.tokenValid) {
+        //
+        //        }
+        //    }
+        //}
+    });
+
+
 
     window.router = new Router();
 });
