@@ -31,7 +31,6 @@ define([
                 }
             }
 
-
             if(!$('.b-verbs-list').length) {
 
                 var that = this;

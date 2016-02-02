@@ -39,7 +39,6 @@
         </div>
         <div class="b-header container"></div>
         <div class="container b-verbs-container"></div>
-        <div class="container b-profile-container"></div>
     </div>
 
 
@@ -86,27 +85,32 @@
                     <form class="col-sm-8">
                         <div class="form-group">
                             <label for="" class="">Email</label>
-                            <input type="email" class="form-control" disabled>
+                            <input type="email" class="form-control" disabled value="<%= email %>">
                         </div>
                         <div class="form-group">
                             <label for="" class="">Username</label>
-                            <input type="text" class="form-control" disabled>
+                            <input type="text" class="form-control" disabled value="<%= username %>">
                         </div>
                         <div class="form-group">
-                            <label for="" class="">Old password</label>
-                            <input type="password" class="form-control">
+                            <button type="submit" disabled class="btn btn-success">Save</button>
                         </div>
-                        <div class="form-group">
-                            <label for="" class="">New password</label>
-                            <input type="password" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="" class="">New password (Confirm)</label>
-                            <input type="password" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-success">Save</button>
-                        </div>
+                        <fieldset class="well">
+                            <div class="form-group">
+                                <label for="" class="">Old password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="">New password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="">New password (Confirm)</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-success">Save</button>
+                            </div>
+                        </fieldset>
                     </form>
                 </div>
             </div>

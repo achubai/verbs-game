@@ -26,7 +26,41 @@ define([
     ProfileModel
 
 ) {
-    var Router = Backbone.Router.extend({
+    Backbone.Router.prototype.before = function () {
+        return true;
+    };
+    Backbone.Router.prototype.after = function () {};
+
+    Backbone.Router.prototype.route = function (route, name, callback) {
+        if (!_.isRegExp(route)) route = this._routeToRegExp(route);
+        if (_.isFunction(name)) {
+            callback = name;
+            name = '';
+        }
+        if (!callback) callback = this[name];
+
+        var router = this;
+
+        Backbone.history.route(route, function(fragment) {
+            var args = router._extractParameters(route, fragment);
+            var beforeResult = router.before();
+
+            if(beforeResult === false) { // sometimes beforeResult is undefined, that why so stupid if
+                return false;
+            }
+
+            if (router.execute(callback, args, name) !== false) {
+                router.trigger.apply(router, ['route:' + name].concat(args));
+                router.trigger('route', name, args);
+                router.after.apply(router, arguments);
+                Backbone.history.trigger('route', router, name, args);
+            }
+        });
+        return this;
+    };
+    
+    
+    Router = Backbone.Router.extend({
         routes: {
             '': 'index',
             'verbs': 'allVerbs',
@@ -36,19 +70,33 @@ define([
             'signin': 'signin',
             'profile': 'profile'
         },
-        checkPermission: function() {
+        before: function() {
+            this.userInfo = {
+                id: null,
+                tokenValid: false,
+                permission: ''
+            };
+
             var adminUrls = [
                 'verbs/edit/',
                 'verbs/create'
             ];
+            var userUrls = [
+                'profile'
+            ];
             var url = Backbone.history.getFragment();
-
             var isAdminProtected = _.find(adminUrls, function(i){
                 return i === url;
             });
-            var userPermission = 'view'
+            var isUserProtected = _.find(userUrls, function(i){
+                return i === url;
+            });
 
-            if (isAdminProtected) {
+            console.log(isAdminProtected, isUserProtected, url);
+
+            if (isAdminProtected || isUserProtected) {
+                var that = this;
+
                 $.ajax({
                     method: 'post',
                     url: 'api/verifyUser',
@@ -56,21 +104,45 @@ define([
                     success: function(data) {
                         if (!data.tokenValid) {
                             console.log('token not valid');
-                            if (localStorage.getItem('verbsUserData')) {
-                                localStorage.removeItem('verbsUserData');
-                            }
+                            window.router.navigate('/signin', {trigger: true});
+
+                            return false;
                         } else {
-                            if (data.admin) {
-                                userPermission = 'admin';
-                            } else {
-                                userPermission = 'user';
+                            that.userInfo.id = data.id;
+                            that.userInfo.tokenValid = data.tokenValid;
+                            that.userInfo.permission = data.permission;
+
+                            if (isUserProtected) {
+                                if (that.userInfo.permission !== 'user') {
+                                    window.router.navigate('/signin', {trigger: true});
+                                    console.log(1)
+                                    return false;
+                                } else {
+                                    console.log(2)
+                                    return true;
+                                }
                             }
+
+                            if (isAdminProtected) {
+                                if (that.userInfo.permission !== 'admin') {
+                                    window.router.navigate('/signin', {trigger: true});
+                                    console.log(3)
+                                    return false;
+                                } else {
+                                    console.log(4)
+                                    return true;
+                                }
+                            }
+
+                            console.log(5)
+                            return false;
                         }
                     }
                 });
+            } else {
+                return true;
             }
 
-            return userPermission;
         },
         initialize: function () {
             this.collection = new VerbsCollection();
@@ -118,12 +190,9 @@ define([
             }
         },
         createVerb: function () {
-            if (this.checkPermission() === 'admin') {
-                this.allVerbsView.createVerbView();
-            } else {
-                console.log(this.checkPermission());
-                window.router.navigate('/signin');
-            }
+            console.log('createVerb render');
+            this.allVerbsView.createVerbView();
+
         },
         join: function () {
             this.joinView.render();
@@ -132,7 +201,8 @@ define([
             this.signinView.render();
         },
         profile: function () {
-            //this.profileView.render();
+            this.hideAllTabs();
+            this.profileView.render();
         },
 
 
@@ -151,6 +221,8 @@ define([
             this.allVerbsView.reRender();
         }
     });
+
+    
 
     $.ajaxSetup({
         beforeSend: function(xhr) {

@@ -34,7 +34,7 @@ define([
             });
 
             this.$el.show();
-
+            console.log(this.$el.html(this.template(model)));
             $('.b-verbs-container').append(this.$el.html(this.template(model)));
 
             this.$title = this.$el.find('h1');

@@ -83,13 +83,11 @@ router.route('/verbs')
 
 // not protected
 router.route('/users')
-    //TODO: remove get password after development,
     .post(checkRegistrationEmailExist,checkRegistrationLoginExist, function(req, res){
         var user = new User();
 
         user.email = req.body.email;
         user.username = req.body.username;
-        user.password = req.body.password;
         user.permission = 'user';
 
         user.save(function(err, mod) {
@@ -137,6 +135,7 @@ router.route('/signin')
                     var token = (crypto.AES.encrypt(JSON.stringify(tokenData), SECRET)).toString();
 
                     res.json({
+                        id: user._id,
                         token: token,
                         permission: user.permission
                     });
@@ -166,7 +165,34 @@ router.route('/logout')
         })
     });
 
-router.use(verifyToken, checkPermissions);
+router.use(verifyToken);
+
+// protected
+router.route('/users/:id')
+    .get(function (req, res) {
+        console.log('user', userSession.userId);
+        User.findById(userSession.userId, function (err, user) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.json({
+                    username: user.username,
+                    email: user.email
+                });
+            }
+        });
+    });
+
+router.route('/verifyUser')
+    .post(function(req, res){
+        res.json({
+            id: userSession.userId,
+            tokenValid: true,
+            permission: userSession.permission
+        })
+    });
+
+router.use(checkPermissions);
 
 // protected
 router.route('/verbs')
@@ -227,37 +253,29 @@ router.route('/verbs/:id')
     });
 
 // protected
-router.route('/users')
-    .get(function (req, res) {
-        User.find(function (err, user) {
-            if(err)
-                res.send(err);
+//router.route('/users')
+//    .get(function (req, res) {
+//        User.find(function (err, user) {
+//            if(err)
+//                res.send(err);
+//
+//            res.json(user);
+//        });
+//    });
+//
+//// protected
+//router.delete('/users/:id', function (req, res) {
+//        User.remove({
+//            _id: req.params.id
+//        }, function (err, user) {
+//            if (err) {
+//                res.send(err);
+//            } else {
+//                res.json({ message: 'User deleted' });
+//            }
+//        });
+//    });
 
-            res.json(user);
-        });
-    });
-
-// protected
-router.route('/users/:id')
-    .delete(function (req, res) {
-        User.remove({
-            _id: req.params.id
-        }, function (err, user) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.json({ message: 'User deleted' });
-            }
-        });
-    });
-
-router.route('/verifyUser')
-    .post(function(req, res){
-        res.json({
-            tokenValid: true,
-            admin: true
-        })
-    });
 
 
 // middlewares
@@ -298,6 +316,7 @@ function verifyToken (req, res, next){
                         userSession.token = token.token;
                         var data = decryptToken(token.token);
 
+                        userSession.userId = data.id;
                         userSession.permission = data.permission;
                         userSession.tokenValid = true;
 
@@ -325,7 +344,7 @@ function verifyToken (req, res, next){
 }
 
 function checkPermissions (req, res, next){
-    if (userSession.permission !== 'user'){
+    if (userSession.permission === 'admin'){
         next();
     } else {
         console.log('No permissions');
