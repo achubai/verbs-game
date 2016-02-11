@@ -32,7 +32,7 @@ define([
         },
         close: function () {
             this.$modal.modal('hide');
-            window.router.navigate('');
+            window.router.navigate('', {trigger: true});
         },
         sendData: function (e) {
             if(this.validate()) {
@@ -49,6 +49,13 @@ define([
 
                         if (data.err) {
                             that.validate(data.err, data.message);
+                        } else {
+                            that.close();
+                            that.saveUser(data);
+
+                            that.trigger('reRenderMenu', that);
+                            that.trigger('reRenderVerbsList', that);
+                            that.trigger('renderHoneView', that);
                         }
                     }
                 });
@@ -93,6 +100,9 @@ define([
             }
 
             return !this.errors;
+        },
+        saveUser: function (data) {
+            localStorage.setItem('verbsUserData', JSON.stringify(data));
         }
 
     });

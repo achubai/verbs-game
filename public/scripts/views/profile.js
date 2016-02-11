@@ -14,8 +14,6 @@ define([
 
         },
         initialize: function () {
-
-
         },
         render: function () {
             var localData = JSON.parse(localStorage.getItem('verbsUserData'));

@@ -91,10 +91,12 @@ router.route('/users')
         user.permission = 'user';
 
         user.save(function(err, mod) {
-            if (err)
+            if (err) {
                 res.send(err);
+            } else {
+                saveToken(createToken(user, res), res);
+            }
 
-            res.json({ message: 'New user!', id: mod._id, email: mod.email,name: mod.username });
         });
     });
 
@@ -126,21 +128,7 @@ router.route('/signin')
 
                 } else {
 
-                    var tokenData = {
-                        id: user._id,
-                        permission: user.permission,
-                        time: (new Date()).getTime()
-                    };
-
-                    var token = (crypto.AES.encrypt(JSON.stringify(tokenData), SECRET)).toString();
-
-                    res.json({
-                        id: user._id,
-                        token: token,
-                        permission: user.permission
-                    });
-
-                    saveToken(token, res);
+                    saveToken(createToken(user, res), res);
                 }
             }
         });
@@ -279,6 +267,24 @@ router.route('/verbs/:id')
 
 
 // middlewares
+
+function createToken (user, res) {
+    var tokenData = {
+        id: user._id,
+        permission: user.permission,
+        time: (new Date()).getTime()
+    };
+
+    var token = (crypto.AES.encrypt(JSON.stringify(tokenData), SECRET)).toString();
+
+    res.json({
+        id: user._id,
+        token: token,
+        permission: user.permission
+    });
+
+    return token;
+}
 
 function saveToken (data, res) {
     var token = new Token();

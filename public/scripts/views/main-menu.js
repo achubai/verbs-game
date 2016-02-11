@@ -69,6 +69,7 @@ define([
 
                     that.trigger('reRenderMenu', that);
                     that.trigger('reRenderVerbsList', that);
+                    that.trigger('renderHoneView', that);
                 }
 
             })

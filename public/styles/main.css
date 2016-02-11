@@ -112,3 +112,31 @@
 .b-profile-main .nav-tabs {
 	margin-bottom: 15px;
 }
+
+.b-home .take-hint {
+	font-size: 14px;
+	border-bottom: 1px dotted;
+	white-space: nowrap;
+	text-decoration: none !important;
+}
+
+.b-home .errors-list {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.b-home .errors-list .translation-text {
+	display: inline-block;
+}
+
+.b-home .errors-list .answer-text {
+	display: inline-block;
+	color: #eea236;
+	margin-right: 5px;
+}
+
+.b-home .errors-list .user-text {
+	display: inline-block;
+	color: #d43f3a;
+	text-decoration: line-through;
+}

@@ -247,7 +247,7 @@
     </script>
     
     <script type="text/template" id="home-template">
-        <h1>V<%= time %> <%= translate %> </h1>
+        <h1><span class="text">V<%= time %> <%= translate %></span> <a href="javascript:void(0);" data-trigger="focus" class="take-hint" data-content="<%= verb %>">Take a hint <span class="glyphicon glyphicon-question-sign"></span></a></h1>
         <input type="text" class="form-control input-lg">
         <div class="text-center">
             <button class="btn-play-again btn btn-success btn-lg">Play again</button>
@@ -262,6 +262,15 @@
                 <i class="glyphicon animated glyphicon-remove-sign"></i>
                 <span class="value">0</span>
             </div>
+        </div>
+        <div class="errors-list"></div>
+    </script>
+
+    <script type="text/template" id="game-errors-list-item">
+        <div class="line">
+            <div class="translation-text"><%= 'v' + time + ' ' + translation %> - </div>
+            <div class="answer-text"><%= answer %></div>
+            <div class="user-text"><%= user %></div>
         </div>
     </script>
 

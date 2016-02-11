@@ -164,9 +164,15 @@ define([
 
             this.listenTo(this.signinView, 'reRenderMenu', this.mainMenuReRender);
             this.listenTo(this.signinView, 'reRenderVerbsList', this.allVerbsRender);
+            this.listenTo(this.signinView, 'renderHoneView', this.index);
+
+            this.listenTo(this.joinView, 'reRenderMenu', this.mainMenuReRender);
+            this.listenTo(this.joinView, 'reRenderVerbsList', this.allVerbsRender);
+            this.listenTo(this.joinView, 'renderHoneView', this.index);
 
             this.listenTo(this.mainMenuView, 'reRenderMenu', this.mainMenuReRender);
             this.listenTo(this.mainMenuView, 'reRenderVerbsList', this.allVerbsRender);
+            this.listenTo(this.mainMenuView, 'renderHoneView', this.index);
         },
 
         // routers
