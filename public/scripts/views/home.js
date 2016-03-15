@@ -20,25 +20,46 @@ define([
             'click .take-hint': 'takeHint'
         },
         initialize: function () {
-            this.gameLength = 1 * 3; // *3 because verb have 3 times;
-            this.gameAllRandom = true;
+            this.userData = JSON.parse(localStorage.getItem('verbsUserData'));
+
+            this.gameLength = this.userData ? this.userData.settings.verbs.number ? this.userData.settings.verbs.number : 15 : 15;
+            this.gameAllRandom = this.userData ? this.userData.settings.verbs.complexity : false;
             this.verbs = this.collection.getVerbsArray(this.gameAllRandom, this.gameLength);
             this.verb = this.getRandomVerb();
             this.time = this.gameAllRandom ? this.verb['time'] : 1;
             this.gameCount = 0;
-            this.succcessCount = 0;
+            this.successCount = 0;
             this.errorsList = [];
 
             this.$progress = $('.b-game-progress');
         },
+        beforeRender: function () {
+            this.newUserData = JSON.parse(localStorage.getItem('verbsUserData'));
+
+            if (this.newUserData) {
+                if (this.userData) {
+                    if (!_.isEqual(this.userData.settings.verbs, this.newUserData.settings.verbs)) {
+                        this.initialize();
+                    }
+                } else {
+                    this.initialize();
+                }
+            }
+        },
         render: function () {
+
+            this.beforeRender();
+
             var model = _.extend(this.verb, {
                 time: this.time,
-                verb: this.verb['v' + this.time]
+                verb: this.verb['v' + this.time],
+                count: this.gameCount,
+                success: this.successCount
             });
 
+
             this.$el.show();
-            console.log(model);
+
             $('.b-verbs-container').append(this.$el.html(this.template(model)));
 
             this.$title = this.$el.find('h1');
@@ -75,7 +96,7 @@ define([
                     this.gameProgress();
 
                     if (value.toLowerCase() == this.verb['v' + this.time].toLowerCase()) {
-                        this.succcessCount++;
+                        this.successCount++;
                         this.successCounter('success');
                     } else {
                         console.log(this.verb);
@@ -124,10 +145,9 @@ define([
             this.$input.val('').focus();
         },
         endGame: function () {
-            this.$title.html('You have ' + Math.round(this.getPercent((this.gameCount - this.succcessCount), this.gameCount)) + '% errors');
+            this.$title.html('You have ' + Math.round(this.getPercent((this.gameCount - this.successCount), this.gameCount)) + '% errors');
             this.$input.hide();
             this.$bntPlayAgain.show().focus();
-            console.log(this.errorsList);
 
             var that = this;
 
@@ -142,7 +162,7 @@ define([
             this.$progress.find('.progress-bar').text(this.gameCount + ' / ' + this.gameLength).width(progress + '%');
         },
         successCounter: function (status) {
-            var num = status == 'success' ? this.succcessCount : this.gameCount - this.succcessCount;
+            var num = status == 'success' ? this.successCount : this.gameCount - this.successCount;
 
             this.$counter.find('.line-' + status).find('.value').text(num);
             this.$counter.find('.line-' + status).find('.glyphicon').addClass('bounce');
@@ -161,7 +181,7 @@ define([
             this.verb = this.getRandomVerb();
             this.time = this.gameAllRandom ? this.verb['time'] : 1;
             this.gameCount = 0;
-            this.succcessCount = 0;
+            this.successCount = 0;
             this.errorsList = [];
 
             this.render();

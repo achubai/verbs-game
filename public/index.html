@@ -12,6 +12,7 @@
 
 </head>
 <body>
+
     <!-- Modal -->
     <div class="modal fade" id="verb-edit-modal" data-backdrop="static">
         <div class="modal-dialog">
@@ -34,6 +35,14 @@
     </div>
 
     <div class="layout">
+
+        <!-- alerts -->
+        <div class="b-alerts-container">
+            <div class="container">
+
+            </div>
+        </div>
+
         <div class="b-game-progress progress">
             <div class="progress-bar" style="width: 0%;"></div>
         </div>
@@ -66,7 +75,25 @@
             </table>
         </div>
     </script>
+    <script type="text/template" id="settings-template">
+        <form id="user-settings-form">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="">The number of words in training</label>
+                    <input type="number" min="3" step="3" name="verbsNumber" class="form-control" value="<%= number %>"/>
+                </div>
+            </div>
 
+            <div class="col-sm-6">
+                <div class="checkbox form-group">
+                    <br/>
+                    <label>
+                        <input type="checkbox" name="verbsComplexity" <%= complexity ? 'checked' : '' %> /> Verbs training complexity advanced
+                    </label>
+                </div>
+            </div>
+        </form>
+    </script>
     <script type="text/template" id="profile-template">
         <aside class="b-profile-side">
             <div class="profile-ava">
@@ -74,44 +101,53 @@
             </div>
         </aside>
         <main class="b-profile-main">
-            <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation"><a href="#user-statistics" aria-controls="home" role="tab" data-toggle="tab">Statistics</a></li>
-                <li role="presentation" class="active"><a href="#user-data" aria-controls="home" role="tab" data-toggle="tab" href="">Data</a></li>
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#profile" data-tab="#user-profile">User data</a></li>
+                <li><a href="#profile/settings" data-tab="#user-settings">Game settings</a></li>
+                <li><a href="#profile/statistics" data-tab="#user-statistics">Statistics</a></li>
             </ul>
             <div class="tab-content">
-                <div role="tabpanel" class="tab-pane" id="user-statistics">Soon:)</div>
-                <div role="tabpanel" class="tab-pane active" id="user-data">
+                <div class="tab-pane" id="user-settings"></div>
+                <div class="tab-pane" id="user-statistics">Soon:)</div>
+                <div class="tab-pane active" id="user-profile">
 
-                    <form class="col-sm-8">
+                    <div class="col-sm-8">
                         <div class="form-group">
                             <label for="" class="">Email</label>
                             <input type="email" class="form-control" disabled value="<%= email %>">
+                            <div class="help-block"></div>
                         </div>
                         <div class="form-group">
                             <label for="" class="">Username</label>
                             <input type="text" class="form-control" disabled value="<%= username %>">
+                            <div class="help-block"></div>
                         </div>
                         <div class="form-group">
                             <button type="submit" disabled class="btn btn-success">Save</button>
                         </div>
                         <fieldset class="well">
-                            <div class="form-group">
-                                <label for="" class="">Old password</label>
-                                <input type="password" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="" class="">New password</label>
-                                <input type="password" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="" class="">New password (Confirm)</label>
-                                <input type="password" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-success">Save</button>
-                            </div>
+                            <form id="change-password-form">
+                                <div class="form-group">
+                                    <label for="" class="">Current password</label>
+                                    <input type="password" class="form-control" name="currentPassword">
+                                    <div class="help-block"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="" class="">New password</label>
+                                    <input type="password" class="form-control" name="newPassword">
+                                    <div class="help-block"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="" class="">New password (Confirm)</label>
+                                    <input type="password" class="form-control" name="confirmPassword">
+                                    <div class="help-block"></div>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-success">Send</button>
+                                </div>
+                            </form>
                         </fieldset>
-                    </form>
+                    </div>
                 </div>
             </div>
         </main>
@@ -189,8 +225,8 @@
                 if (admin) {
         %>
             <div class="b-auth">
-                <a class="btn btn-default" href="#profile">
-                    <i class="glyphicon glyphicon-user"></i>
+                <a class="btn btn-default" href="#admin">
+                    <i class="glyphicon glyphicon-cog"></i>
                     Admin
                 </a>
                 <a class="btn btn-danger btn-logout" href="">Log out</a>
@@ -204,8 +240,7 @@
             <% } else { %>
                 <div class="b-auth">
                     <a class="btn btn-default" href="#profile">
-                        <i class="glyphicon glyphicon-user"></i>
-                        User
+                        <i class="glyphicon glyphicon-cog"></i>
                     </a>
                     <a class="btn btn-danger btn-logout" href="">Log out</a>
                 </div>
@@ -256,11 +291,11 @@
         <div class="counter">
             <div class="line line-success">
                 <i class="glyphicon animated glyphicon-ok-sign"></i>
-                <span class="value">0</span>
+                <span class="value"><%= success %></span>
             </div>
             <div class="line line-error">
                 <i class="glyphicon animated glyphicon-remove-sign"></i>
-                <span class="value">0</span>
+                <span class="value"><%= count - success %></span>
             </div>
         </div>
         <div class="errors-list"></div>
@@ -320,6 +355,57 @@
             <button type="submit" class="btn btn-primary">Save</button>
         </div>
         
+    </script>
+    <script type="text/template" id="alert-template">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <%= text %>
+    </script>
+    <script type="text/template" id="admin-template">
+        <fieldset class="well">
+            <form id="change-password-form">
+                <div class="form-group">
+                    <label for="" class="">Current password</label>
+                    <input type="password" class="form-control" name="currentPassword">
+                    <div class="help-block"></div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="">New password</label>
+                    <input type="password" class="form-control" name="newPassword">
+                    <div class="help-block"></div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="">New password (Confirm)</label>
+                    <input type="password" class="form-control" name="confirmPassword">
+                    <div class="help-block"></div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Send</button>
+                </div>
+            </form>
+        </fieldset>
+    </script>
+
+    <script type="text/template" id="users-list-template">
+        <div class="b-users verbs-tab-block">
+            <table class="b-users-table table">
+                <thead>
+                <tr>
+                    <th class="name-title">Name</th>
+                    <th>Email</th>
+                    <th>Permission</th>
+                    <th>Start date</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </script>
+    <script type="text/template" id="users-list-item-template">
+
+        <td><img width="65" src="../images/profile-icon.png" alt=""/> <%= username %></td>
+        <td><%= email %></td>
+        <td><%= permission %></td>
+        <td><%= date.month + '/' + date.day + '/' + date.year %></td>
+
     </script>
 </body>
 </html>

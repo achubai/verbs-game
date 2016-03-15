@@ -140,3 +140,35 @@
 	color: #d43f3a;
 	text-decoration: line-through;
 }
+
+.b-alerts-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 99;
+	padding-top: 10px;
+}
+
+.b-alerts-container .alert {
+	transform: translate3d(0, -100%, 0);
+	transition: transform 0.3s ease;
+}
+
+.b-alerts-container .alert.in {
+	transform: translate3d(0, 0, 0);
+}
+
+.b-alerts-container .alert.move-down {
+	transform: translate3d(0, 100%, 0);
+}
+
+.b-users-table .name-title {
+	padding-left: 88px;
+}
+.b-users-table td {
+	vertical-align: middle !important;
+}
+.b-users-table td img {
+	margin-right: 10px;
+}

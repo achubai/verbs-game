@@ -1,59 +1,35 @@
 /**
- * Created by achubai on 1/28/2016.
+ * Created by achubai on 3/11/2016.
  */
+
 define([
     'jquery',
     'underscore',
-    'backbone',
-    '../views/settings'
-], function ($, _, Backbone, SettingsView) {
+    'backbone'
+], function ($, _, Backbone) {
 
     return Backbone.View.extend({
-        className: 'b-profile verbs-tab-block',
-        template: _.template($('#profile-template').html()),
-        settingsView: new SettingsView(),
+        className: 'b-admin verbs-tab-block',
+        template: _.template($('#admin-template').html()),
         events: {
             'submit #change-password-form': 'changePassword'
         },
         initialize: function () {
             this.isRendered = false;
         },
-        render: function (callback) {
-
-            var localData = JSON.parse(localStorage.getItem('verbsUserData'));
-            this.userId = localData ? localData.id : '';
-
+        render: function () {
             if (!this.isRendered) {
-                if (!$('.b-profile').length) {
-                    var that = this;
-                    $.ajax({
-                        method: 'GET',
-                        url: '/api/users/' + that.userId,
-                        success: function (data) {
+                $('.b-verbs-container').append(this.$el.html(
+                    this.template()
+                ));
+                this.isRendered = true;
 
-
-                            $('.b-verbs-container').append(
-                                that.$el.html(that.template({
-                                    email: data.email,
-                                    username: data.username
-                                }))
-                            );
-                            that.isRendered = true;
-                            that.activateTab();
-
-                            if (typeof callback === 'function') {
-                                callback.call(that);
-                            }
-                        }
-                    });
-
-                    return this;
-                }
+                return this;
             }
 
-            this.activateTab();
             this.$el.show();
 
+            return false;
         },
         changePassword: function (e) {
             var $form = $(e.currentTarget);
@@ -107,24 +83,7 @@ define([
                 $(el).removeClass('has-error').find('.help-block').text('');
                 $(el).find('.form-control').val('');
             });
-        },
-        activateTab: function () {
-            var href = window.location.hash.replace('#', '');
-            var $tab = this.$el.find('.b-profile-main > .nav > li a[href="#' + href + '"]');
-
-            this.$el.find('.b-profile-main > .nav > li').removeClass('active');
-            $tab.closest('li').addClass('active');
-
-            this.$el.find('.b-profile-main .tab-pane').removeClass('active');
-            $($tab.data('tab')).addClass('active');
-
-        },
-        showSettings: function () {
-            this.settingsView.render();
-
-        },
-        showStatistics: function () {
-            console.log('showStatistics');
         }
     })
+
 });

@@ -9,7 +9,6 @@ define([
 ], function ($, _, Backbone) {
 
     return Backbone.View.extend({
-
         tagName: 'tr',
         template: _.template($('#verbs-item').html()),
         initialize: function () {

@@ -33,7 +33,18 @@ var userSchema = new Schema({
     email: String,
     username: String,
     password: String,
-    permission: String
+    permission: String,
+    settings: {
+        verbs: {
+            number: Number,
+            complexity: Boolean
+        }
+    },
+    startDate: {
+        month: Number,
+        day: Number,
+        year: Number
+    }
 
 }
     //, {collection: 'users'}
@@ -66,7 +77,14 @@ var userSession = {
     userId: null,
     token : null,
     tokenValid: false,
-    permission: null
+    permission: null,
+    password: null,
+    settings: {
+        verbs: {
+            number: null,
+            complexity: false
+        }
+    }
 };
 
 
@@ -85,10 +103,17 @@ router.route('/verbs')
 router.route('/users')
     .post(checkRegistrationEmailExist,checkRegistrationLoginExist, function(req, res){
         var user = new User();
+        var date = new Date();
 
         user.email = req.body.email;
         user.username = req.body.username;
         user.permission = 'user';
+        user.password = req.body.password;
+        user.settings.verbs.number = 15;
+        user.settings.verbs.complexity = false;
+        user.startDate.day = date.getDate();
+        user.startDate.month = date.getMonth() + 1;
+        user.startDate.year = date.getFullYear();
 
         user.save(function(err, mod) {
             if (err) {
@@ -171,6 +196,76 @@ router.route('/users/:id')
         });
     });
 
+// protected
+router.route('/users/:id/password')
+    .put(function (req, res) {
+
+        User.findById(userSession.userId, function (err, user) {
+            if (err) {
+                res.send(err);
+            } else {
+                if (req.body.currentPassword === user.password) {
+
+                    if (req.body.newPassword === req.body.confirmPassword) {
+
+                        user.password = req.body.newPassword;
+
+                        user.save(function (err) {
+                            if (err) {
+                                res.send(err);
+                            } else {
+                                res.json({
+                                    status: 'ok',
+                                    message: 'Password was changed'
+                                })
+                            }
+                        });
+
+                    } else {
+                        res.json({
+                            err: 'confirmPassword',
+                            message: 'The confirm password do not match.'
+                        })
+                    }
+
+                } else {
+                    res.json({
+                        err: 'currentPassword',
+                        message: 'The provided password is incorrect.'
+                    })
+                }
+            }
+        });
+    });
+
+// protected
+router.route('/users/:id/settings')
+    .put(function (req, res) {
+
+        User.findById(userSession.userId, function (err, user) {
+            if (err) {
+                res.send(err);
+            } else {
+                user.settings.verbs.number = req.body.verbsNumber;
+                user.settings.verbs.complexity = !!req.body.verbsComplexity;
+
+                user.save(function (err) {
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        res.json({
+                            verbs: {
+                                number: user.settings.verbs.number,
+                                complexity: user.settings.verbs.complexity
+                            }
+                        });
+                    }
+                })
+
+            }
+        });
+    });
+
 router.route('/verifyUser')
     .post(function(req, res){
         res.json({
@@ -241,28 +336,36 @@ router.route('/verbs/:id')
     });
 
 // protected
-//router.route('/users')
-//    .get(function (req, res) {
-//        User.find(function (err, user) {
-//            if(err)
-//                res.send(err);
-//
-//            res.json(user);
-//        });
-//    });
-//
-//// protected
-//router.delete('/users/:id', function (req, res) {
-//        User.remove({
-//            _id: req.params.id
-//        }, function (err, user) {
-//            if (err) {
-//                res.send(err);
-//            } else {
-//                res.json({ message: 'User deleted' });
-//            }
-//        });
-//    });
+router.route('/users')
+    .get(function (req, res) {
+        User.find(function (err, users) {
+            if (err) {
+                res.send(err);
+            } else {
+
+                for (var i = 0, length = users.length; i < length; i++) {
+                    users[i].password = null;
+                }
+                
+                res.json({
+                    users: users
+                });
+            }
+        });
+    });
+
+// protected
+router.delete('/users/:id', function (req, res) {
+        User.remove({
+            _id: req.params.id
+        }, function (err, user) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.json({ message: 'User deleted' });
+            }
+        });
+    });
 
 
 
@@ -280,7 +383,13 @@ function createToken (user, res) {
     res.json({
         id: user._id,
         token: token,
-        permission: user.permission
+        permission: user.permission,
+        settings: {
+            verbs: {
+                complexity: user.settings.verbs.complexity,
+                number: user.settings.verbs.number
+            }
+        }
     });
 
     return token;

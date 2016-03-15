@@ -45,8 +45,6 @@ define([
                     data: $form.serialize(),
 
                     success: function(data) {
-                        console.log(data);
-
                         if (data.err) {
                             that.validate(data.err, data.message);
                         } else {

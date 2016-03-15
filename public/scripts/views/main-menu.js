@@ -47,16 +47,16 @@ define([
             return true;
         },
         setActiveClass: function (route) {
-            if (this.auth) {
-                this.$nav.find('li').removeClass('active');
 
-                if (route == '') {
-                    this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
-                } else {
-                    route = route.substring(0, route.indexOf('/'));
-                    this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
-                }
+            this.$nav.find('li').removeClass('active');
+
+            if (route == '') {
+                this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
+            } else {
+                route = route.indexOf('/') === -1 ? route : route.substring(0, route.indexOf('/'));
+                this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
             }
+
         },
         logout: function () {
             var that = this;

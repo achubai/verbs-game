@@ -12,7 +12,10 @@ define([
     '../views/join',
     '../views/signin',
     '../models/user',
-    '../views/profile'
+    '../views/profile',
+    '../views/alert',
+    '../views/admin',
+    '../views/users-list'
 ],function (
     Backbone,
     VerbsCollection,
@@ -23,8 +26,10 @@ define([
     JoinView,
     SigninView,
     UserModel,
-    ProfileModel
-
+    ProfileModel,
+    AlertView,
+    AdminView,
+    UsersListView
 ) {
     Backbone.Router.prototype.before = function () {
         return true;
@@ -43,13 +48,10 @@ define([
 
         Backbone.history.route(route, function(fragment) {
             var args = router._extractParameters(route, fragment);
-            var beforeResult = router.before();
 
-            if(beforeResult === false) { // sometimes beforeResult is undefined, that why so stupid if
+            if(!router.before()) {
                 return false;
-            }
-
-            if (router.execute(callback, args, name) !== false) {
+            } else if (router.execute(callback, args, name) !== false) {
                 router.trigger.apply(router, ['route:' + name].concat(args));
                 router.trigger('route', name, args);
                 router.after.apply(router, arguments);
@@ -68,7 +70,11 @@ define([
             'verbs/create': 'createVerb',
             'join': 'join',
             'signin': 'signin',
-            'profile': 'profile'
+            'profile': 'profile',
+            'profile/settings': 'settings',
+            'profile/statistics': 'statistics',
+            'admin': 'admin',
+            'users': 'users'
         },
         before: function() {
             this.userInfo = {
@@ -79,23 +85,30 @@ define([
 
             var adminUrls = [
                 'verbs/edit/',
-                'verbs/create'
+                'verbs/create',
+                'admin',
+                'users'
             ];
             var userUrls = [
-                'profile'
+                'profile',
+                'profile/settings',
+                'profile/statistics'
             ];
             var url = Backbone.history.getFragment();
+
             var isAdminProtected = _.find(adminUrls, function(i){
                 return i === url;
             });
+
             var isUserProtected = _.find(userUrls, function(i){
                 return i === url;
             });
 
-            console.log(isAdminProtected, isUserProtected, url);
+            if (!!isAdminProtected || !!isUserProtected) {
 
-            if (isAdminProtected || isUserProtected) {
                 var that = this;
+
+                var result = false;
 
                 $.ajax({
                     method: 'post',
@@ -103,46 +116,32 @@ define([
                     async: false,
                     success: function(data) {
                         if (!data.tokenValid) {
-                            console.log('token not valid');
-                            window.router.navigate('/signin', {trigger: true});
 
-                            return false;
+                            window.router.navigate('/signin', {trigger: true});
+                            localStorage.removeItem('verbsUserData');
+                            that.mainMenuReRender();
+
+                            result = false;
                         } else {
                             that.userInfo.id = data.id;
                             that.userInfo.tokenValid = data.tokenValid;
                             that.userInfo.permission = data.permission;
 
                             if (isUserProtected) {
-                                if (that.userInfo.permission !== 'user') {
-                                    window.router.navigate('/signin', {trigger: true});
-                                    console.log(1)
-                                    return false;
-                                } else {
-                                    console.log(2)
-                                    return true;
-                                }
+                                result = that.userProtected();
                             }
 
                             if (isAdminProtected) {
-                                if (that.userInfo.permission !== 'admin') {
-                                    window.router.navigate('/signin', {trigger: true});
-                                    console.log(3)
-                                    return false;
-                                } else {
-                                    console.log(4)
-                                    return true;
-                                }
+                                result = that.adminProtected();
                             }
-
-                            console.log(5)
-                            return false;
                         }
                     }
                 });
             } else {
-                return true;
+                result = true;
             }
 
+            return result;
         },
         initialize: function () {
             this.collection = new VerbsCollection();
@@ -156,11 +155,15 @@ define([
             this.joinView = new JoinView({model: new UserModel});
             this.signinView = new SigninView();
             this.profileView = new ProfileModel();
+            this.adminView = new AdminView();
+            this.usersListView = new UsersListView();
 
             Backbone.history.start();
 
             this.listenTo(this, 'route', this.getRout);
             this.getRout();
+
+            this.listenTo(this, 'showAlert', this.alertRender, this);
 
             this.listenTo(this.signinView, 'reRenderMenu', this.mainMenuReRender);
             this.listenTo(this.signinView, 'reRenderVerbsList', this.allVerbsRender);
@@ -196,7 +199,6 @@ define([
             }
         },
         createVerb: function () {
-            console.log('createVerb render');
             this.allVerbsView.createVerbView();
 
         },
@@ -210,6 +212,28 @@ define([
             this.hideAllTabs();
             this.profileView.render();
         },
+        settings: function () {
+            if (this.profileView.isRendered) {
+                this.profileView.activateTab();
+                this.profileView.showSettings();
+            } else {
+                this.hideAllTabs();
+                this.profileView.render(this.profileView.showSettings);
+            }
+
+        },
+        statistics: function () {
+            this.profile();
+            this.profileView.showStatistics();
+        },
+        admin: function () {
+            this.hideAllTabs();
+            this.adminView.render();
+        },
+        users: function () {
+            this.hideAllTabs();
+            this.usersListView.render();
+        },
 
 
         // helpers
@@ -222,9 +246,30 @@ define([
         mainMenuReRender: function () {
             this.mainMenuView.render();
         },
+        alertRender: function (data) {
+            this.alertView = new AlertView();
+
+            this.alertView.render(data);
+        },
         allVerbsRender: function () {
             this.hideAllTabs();
             this.allVerbsView.reRender();
+        },
+        userProtected: function () {
+            if (this.userInfo.permission !== 'user') {
+                window.router.navigate('/signin', {trigger: true});
+                return false;
+            } else {
+                return true;
+            }
+        },
+        adminProtected: function () {
+            if (this.userInfo.permission !== 'admin') {
+                window.router.navigate('/signin', {trigger: true});
+                return false;
+            } else {
+                return true;
+            }
         }
     });
 
