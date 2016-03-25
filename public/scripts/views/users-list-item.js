@@ -19,11 +19,7 @@ define([
                 username: this.model.username || 'Name',
                 email: this.model.email || 'Email',
                 permission: this.model.permission || 'Permission',
-                date: {
-                    day: this.model.startDate ? this.model.startDate.day : 'Day',
-                    month: this.model.startDate ? this.model.startDate.month : 'Month',
-                    year: this.model.startDate ? this.model.startDate.year : 'Year'
-                }
+                date: this.model.startDate || 'Date'
             };
 
             this.$el.html(this.template(model));

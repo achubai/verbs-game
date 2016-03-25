@@ -9,6 +9,15 @@ var bodyParser = require('body-parser');
 var Schema = mongoose.Schema;
 var schedule = require('node-schedule');
 var crypto = require('crypto-js');
+var nodemailer = require('nodemailer');
+var smtpTransport = require('nodemailer-smtp-transport');
+var transporter = nodemailer.createTransport(smtpTransport({
+    service: 'Gmail',
+    auth: {
+        user: "ejko4ubej@gmail.com", // TODO: this data should be taken form db.
+        pass: "testpassw0rd" // TODO: this data should be taken form db.
+    }
+}));
 
 var SECRET = 'secret';
 
@@ -40,11 +49,7 @@ var userSchema = new Schema({
             complexity: Boolean
         }
     },
-    startDate: {
-        month: Number,
-        day: Number,
-        year: Number
-    }
+    startDate: Date
 
 }
     //, {collection: 'users'}
@@ -57,9 +62,30 @@ var tokensSchema = new Schema({
     //, {collection: 'users'}
 );
 
+var ObjectId = Schema.ObjectId;
+var statsSchema = new Schema({
+    testId: ObjectId,
+    verbId: { type: ObjectId, ref: 'Verb' },
+    userId: { type: ObjectId, ref: 'User' },
+    ratingId: { type: ObjectId, ref: 'Rating' },
+    verbForm: Number,
+    success: Boolean,
+    usedHint: Boolean,
+    date: Date
+});
+
+var ratingSchema = new Schema({
+    user: { type: ObjectId, ref: 'User' },
+    score: Number,
+    stats: ObjectId,
+    date: Date
+});
+
 var Verb = mongoose.model('Verb', verbSchema, 'verbs');
 var User = mongoose.model('User', userSchema, 'users');
 var Token = mongoose.model('Token', tokensSchema, 'tokens');
+var Stats = mongoose.model('Stats', statsSchema, 'stats');
+var Rating = mongoose.model('Rating', ratingSchema, 'rating');
 
 mongoose.connection.on('connected', function () {
     console.log('connected to verbs');
@@ -71,7 +97,6 @@ mongoose.connection.on('error',function (err) {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
 
 var userSession = {
     userId: null,
@@ -86,7 +111,6 @@ var userSession = {
         }
     }
 };
-
 
 // not protected
 router.route('/verbs')
@@ -103,7 +127,6 @@ router.route('/verbs')
 router.route('/users')
     .post(checkRegistrationEmailExist,checkRegistrationLoginExist, function(req, res){
         var user = new User();
-        var date = new Date();
 
         user.email = req.body.email;
         user.username = req.body.username;
@@ -111,11 +134,9 @@ router.route('/users')
         user.password = req.body.password;
         user.settings.verbs.number = 15;
         user.settings.verbs.complexity = false;
-        user.startDate.day = date.getDate();
-        user.startDate.month = date.getMonth() + 1;
-        user.startDate.year = date.getFullYear();
+        user.startDate= new Date();
 
-        user.save(function(err, mod) {
+        user.save(function(err) {
             if (err) {
                 res.send(err);
             } else {
@@ -178,12 +199,118 @@ router.route('/logout')
         })
     });
 
+// not protected
+router.route('/stats')
+    .post(function (req, res) {
+        var testId = mongoose.Types.ObjectId();
+
+        saveStats(req.body.statsList, null, testId, function (err) {
+            if (err) {
+                res.json({
+                    err: err
+                });
+            }
+        });
+    });
+
+// not protected
+router.route('/restore/password')
+    .post(function (req, res) {
+        User.findOne({email: req.body.forgotPassword}, function (err, user) {
+            if (err) {
+                res.send(err)
+            } else {
+                if (user) {
+
+                    transporter.sendMail({  // TODO: this should be template
+                        from: 'Verbs',
+                        to: user.email,
+                        subject: 'Forgot password',
+                        html: '<h3>Hello, ' + user.username +'.</h3>' +
+                        '<p>Your password is <span style="text-transform: lowercase">' + user.password + '</p>'
+                    }, function (){
+                        res.json({
+                            message: 'The password was sent to your email.'
+                        })
+                    });
+
+                } else {
+                    res.json({
+                        err: 'forgotPassword',
+                        message: 'Email not found'
+                    })
+                }
+            }
+        })
+    });
+
+// not protected
+router.route('/rating')
+    .get(function (req, res) {
+        Rating.aggregate([
+            {
+                $group: {
+                    _id: '$user',
+                    user: { $first: '$user'},
+                    score: {$max: '$score'}
+                }
+            },
+            {
+                $sort : {
+                    score: -1
+                }
+            },
+            {
+                $limit : 10
+            }
+        ], function (err, arr) {
+            if (err) {
+                res.json(err);
+            } else {
+                Rating.populate(arr, {path: 'user', select: 'username -_id'}, function (err, newArr) {
+                    if (err) {
+                        res.json(err);
+                    } else {
+                        res.json(newArr);
+                    }
+                })
+            }
+        })
+
+    })
+    .post(function (req, res) {
+
+        var rating = new Rating;
+        var testId = mongoose.Types.ObjectId();
+
+        rating.user = req.body.userId;
+        rating.score = req.body.score;
+        rating.stats = testId;
+        rating.date = new Date();
+
+        rating.save(function (err, item) {
+            if (err) {
+                res.json({
+                    err: err
+                });
+            } else {
+
+                saveStats(req.body.statsList, item._id, testId, function (err) {
+                    if (err) {
+                        res.json({
+                            err: err
+                        });
+                    }
+                });
+            }
+        });
+    });
+
 router.use(verifyToken);
 
 // protected
 router.route('/users/:id')
     .get(function (req, res) {
-        console.log('user', userSession.userId);
         User.findById(userSession.userId, function (err, user) {
             if (err) {
                 res.send(err);
@@ -327,11 +454,12 @@ router.route('/verbs/:id')
     .delete(function (req, res) {
         Verb.remove({
             _id: req.params.id
-        }, function(err, verb) {
-            if (err)
-                res.send(err);
-
-            res.json({ message: 'Successfully deleted' });
+        }, function(err) {
+            if (err) {
+                res.json(err);
+            } else {
+                res.json({ message: 'Successfully deleted' });
+            }
         })
     });
 
@@ -346,7 +474,7 @@ router.route('/users')
                 for (var i = 0, length = users.length; i < length; i++) {
                     users[i].password = null;
                 }
-                
+
                 res.json({
                     users: users
                 });
@@ -358,7 +486,7 @@ router.route('/users')
 router.delete('/users/:id', function (req, res) {
         User.remove({
             _id: req.params.id
-        }, function (err, user) {
+        }, function (err) {
             if (err) {
                 res.send(err);
             } else {
@@ -366,8 +494,6 @@ router.delete('/users/:id', function (req, res) {
             }
         });
     });
-
-
 
 // middlewares
 
@@ -411,7 +537,6 @@ function decryptToken (token) {
     var bytes  = crypto.AES.decrypt(token, SECRET);
     return  JSON.parse(bytes.toString(crypto.enc.Utf8));
 }
-
 
 function verifyToken (req, res, next){
 
@@ -502,12 +627,31 @@ function checkRegistrationLoginExist(req, res, next){
     });
 }
 
+function saveStats (statsList, ratingId, testId, callback) {
+
+    if (statsList) {
+        statsList.forEach(function (el) {
+            var stats = new Stats();
+
+            stats.testId = testId;
+            stats.verbId = el.verbId;
+            stats.userId = el.userId || null;
+            stats.verbForm = el.verbForm;
+            stats.success = el.success;
+            stats.ratingId = ratingId;
+            stats.usedHint = el.usedHint;
+            stats.date = new Date();
+
+            stats.save(callback)
+        });
+    }
+}
 
 var rule = new schedule.RecurrenceRule();
 rule.minute = new schedule.Range(0, 0, 59);
 
 schedule.scheduleJob(rule, function(){
-    Token.update({valid: true}, {valid: false}, function(err, token) {
+    Token.update({valid: true}, {valid: false}, function(err) {
         if(err) {
             throw err;
         } else {
@@ -516,7 +660,6 @@ schedule.scheduleJob(rule, function(){
         }
     })
 });
-
 
 app.use('/api', router);
 app.listen(3000);

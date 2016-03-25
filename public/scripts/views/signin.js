@@ -16,7 +16,8 @@ define([
         },
         events: {
             'click .close': 'close',
-            'submit #signin-form': 'sendData'
+            'submit #signin-form': 'sendData',
+            'click a[href="#forgot"]': 'close'
         },
         render: function () {
             if(!this.isRendered) {
@@ -32,7 +33,7 @@ define([
         },
         close: function () {
             this.$modal.modal('hide');
-            window.router.navigate('');
+            window.router.navigate('', {trigger: true});
         },
         sendData: function (e) {
             if(this.validate()) {

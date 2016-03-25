@@ -34,6 +34,13 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="forgot-modal"  data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
     <div class="layout">
 
         <!-- alerts -->
@@ -50,6 +57,12 @@
         <div class="container b-verbs-container"></div>
     </div>
 
+    <audio src="/audio/gong.mp3" id="gong"></audio>
+    <audio src="/audio/correct.mp3" id="correct"></audio>
+    <audio src="/audio/incorrect.mp3" id="incorrect"></audio>
+    <audio src="/audio/show_result.mp3" id="show-result"></audio>
+    <audio src="/audio/start_tick.mp3" id="start-tick"></audio>
+    <audio src="/audio/bonus.mp3" id="bonus"></audio>
 
     <script data-main="scripts/main" src="scripts/libs/require.js"></script>
 
@@ -162,7 +175,7 @@
             <form id="join-form" class="b-auth-form">
                 <div class="form-group has-feedback">
                     <label class="control-label" for="join-email">Email</label>
-                    <input type="text" class="form-control" id="join-email" name="email">
+                    <input type="email" class="form-control" id="join-email" name="email">
                     <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
                     <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
                     <span class="help-block">Please fill email</span>
@@ -208,13 +221,32 @@
                     <span class="help-block">Insert username</span>
                 </div>
                 <div class="form-group has-feedback">
-                    <label class="control-label" for="signin-pass">Password <a href="#">(forgot password)</a></label>
+                    <label class="control-label" for="signin-pass">Password <a href="#forgot">(forgot password)</a></label>
                     <input type="password" class="form-control" id="signin-pass" name="password">
                     <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
                     <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
                     <span class="help-block">Insert password</span>
                 </div>
                 <button type="submit" class="btn btn-success">Sign in</button>
+            </form>
+        </div>
+    </script>
+
+    <script type="text/template" id="forgot-template">
+        <div class="modal-header">
+            <button type="button" class="close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Forgot password</h4>
+        </div>
+        <div class="modal-body">
+            <form id="forgot-form" class="b-auth-form">
+                <div class="form-group has-feedback">
+                    <label for="forgot-password">Insert your email</label>
+                    <input type="email" class="form-control" id="forgot-password" name="forgotPassword" required>
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                    <span class="help-block">Insert email</span>
+                </div>
+                <button type="submit" class="btn btn-success">Send</button>
             </form>
         </div>
     </script>
@@ -247,6 +279,8 @@
                 <ul class="nav nav-pills">
                     <li class="active"><a href="#">Home</a></li>
                     <li><a href="#verbs">Verbs</a></li>
+                    <li><a href="#rating">Rating test</a></li>
+                    <li><a href="#rating-list">Rating list</a></li>
                 </ul>
             <% } %>
         <% } else { %>
@@ -260,6 +294,8 @@
             <ul class="nav nav-pills">
                 <li class="active"><a href="#">Home</a></li>
                 <li><a href="#verbs">Verbs</a></li>
+                <li><a href="#rating">Rating test</a></li>
+                <li><a href="#rating-list">Rating list</a></li>
             </ul>
         <% } %>
 
@@ -404,8 +440,42 @@
         <td><img width="65" src="../images/profile-icon.png" alt=""/> <%= username %></td>
         <td><%= email %></td>
         <td><%= permission %></td>
-        <td><%= date.month + '/' + date.day + '/' + date.year %></td>
+        <td><%= date %></td>
 
+    </script>
+
+    <script type="text/template" id="rating-template">
+        <div class="b-start-container text-center">
+            <button class="btn btn-success btn-lg">START TEST</button>
+            <% if (!user) {%>
+                <div class="hint">Login to save your rating.</div>
+            <%}%>
+        </div>
+
+        <div class="b-before-start-timer" style="display: none;">3</div>
+        <div class="test-counter" style="display: none;">0</div>
+        <div class="b-test-block">
+            <div class="correct-counter">
+                <div class="correct-item"><i class="glyphicon glyphicon-empty"></i></div>
+                <div class="correct-item"><i class="glyphicon glyphicon-empty"></i></div>
+                <div class="correct-item"><i class="glyphicon glyphicon-empty"></i></div>
+                <div class="counter-text"></div>
+            </div>
+            <div class="error-container">
+                <i class="glyphicon animated glyphicon-remove-sign"></i>
+            </div>
+            <h1 class="text-center"><span class="text">V<%= time %> <%= translate %></span></h1>
+            <input type="text" class="form-control input-lg">
+            <div class="hint">Enter</div>
+        </div>
+    </script>
+
+    <script type="text/template" id="rating-list-template">
+        <div class="user-item">
+            <div class="score"><%= score %></div>
+            <img src="../images/profile-icon.png" alt=""/>
+            <div class="username"><%= username %></div>
+        </div>
     </script>
 </body>
 </html>

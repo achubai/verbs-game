@@ -6,9 +6,10 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'collections/verbs',
+    '../utils/verbs',
+    '../utils/stats',
     'bootstrap'
-], function ($, _, Backbone, VerbsCollection) {
+], function ($, _, Backbone, verbsUtils, statsUtils) {
 
     return Backbone.View.extend({
         className: 'b-home verbs-tab-block',
@@ -22,6 +23,7 @@ define([
         initialize: function () {
             this.userData = JSON.parse(localStorage.getItem('verbsUserData'));
 
+            this.userId = this.userData ? this.userData.id : null;
             this.gameLength = this.userData ? this.userData.settings.verbs.number ? this.userData.settings.verbs.number : 15 : 15;
             this.gameAllRandom = this.userData ? this.userData.settings.verbs.complexity : false;
             this.verbs = this.collection.getVerbsArray(this.gameAllRandom, this.gameLength);
@@ -30,6 +32,9 @@ define([
             this.gameCount = 0;
             this.successCount = 0;
             this.errorsList = [];
+            this.statsList = [];
+            this.usedHint = false;
+            this.successVerb = null;
 
             this.$progress = $('.b-game-progress');
         },
@@ -68,23 +73,22 @@ define([
             this.$bntPlayAgain = this.$el.find('.btn-play-again');
             this.$errorsList = this.$el.find('.errors-list');
 
+            this.gameProgress();
+
             this.$input.focus();
 
             return this;
         },
         getRandomVerb: function (elem) {
 
-            if (elem) {
-                this.verbs = _.reject(this.verbs, function (el) {
-                    return el == elem;
-                });
-            }
+            var newData = verbsUtils.getRandomVerb(this.verbs, elem);
+
+            this.verbs = newData.verbs;
+            this.verb = newData.verb;
 
             if (this.verbs.length != 0) {
-                this.verb = this.verbs[_.random(this.verbs.length - 1)];
                 return this.verb;
             } else {
-                this.verb = false;
                 this.endGame();
             }
         },
@@ -93,13 +97,16 @@ define([
                 var value = this.$input.val().trim();
 
                 if (value != '') {
+                    this.gameCount++;
+
                     this.gameProgress();
 
-                    if (value.toLowerCase() == this.verb['v' + this.time].toLowerCase()) {
+                    if (verbsUtils.checkVerb(this.$input.val().trim(), this.verb['v' + this.time])) {
+                        this.successVerb = true;
                         this.successCount++;
                         this.successCounter('success');
                     } else {
-                        console.log(this.verb);
+                        this.successVerb = false;
                         this.successCounter('error');
 
                         this.errorsList.push({
@@ -109,6 +116,8 @@ define([
                             user: value.toLowerCase()
                         })
                     }
+
+                    this.catchStats(this.successVerb);
 
                     this.newVerb();
                 }
@@ -140,6 +149,9 @@ define([
         renderNew: function () {
             var verb = this.verb['v' + this.time];
 
+            this.usedHint = false;
+            this.successVerb = null;
+
             this.$title.find('.text').text('V' + this.time + ' ' + this.verb['translate']);
             this.$title.find('.take-hint').attr('data-content', verb).data('bs.popover');
             this.$input.val('').focus();
@@ -154,9 +166,10 @@ define([
             _.each(this.errorsList, function (model) {
                 that.$errorsList.append(that.errorsListItemTemplate(model))
             });
+
+            statsUtils.sendStats(this.statsList);
         },
         gameProgress: function () {
-            this.gameCount++;
             var progress = this.getPercent(this.gameCount, this.gameLength);
 
             this.$progress.find('.progress-bar').text(this.gameCount + ' / ' + this.gameLength).width(progress + '%');
@@ -183,13 +196,26 @@ define([
             this.gameCount = 0;
             this.successCount = 0;
             this.errorsList = [];
+            this.statsList = [];
 
             this.render();
             this.$progress.find('.progress-bar').text('').width(0);
             $(document).off('keypress');
         },
         takeHint: function () {
+            this.usedHint = true;
             this.$el.find('.take-hint').popover('show');
+        },
+        catchStats: function (success) {
+            var verbStats = {};
+
+            verbStats.userId = this.userId;
+            verbStats.verbId = this.verb._id ;
+            verbStats.verbForm = this.time;
+            verbStats.usedHint = this.usedHint;
+            verbStats.success = success;
+
+            this.statsList.push(verbStats);
         }
 
     });

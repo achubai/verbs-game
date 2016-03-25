@@ -22,6 +22,10 @@ define([
             var verb;
             var found = false;
 
+            if (gameLength === 'all') {
+                gameLength = this.length * 3;
+            }
+
             if(allRandom) {
                 while (allRandomVerbs.length < gameLength) {
                     verb = this.models[_.random(this.models.length - 1)];

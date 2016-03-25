@@ -31,7 +31,6 @@ define([
                         url: '/api/users/' + that.userId,
                         success: function (data) {
 
-
                             $('.b-verbs-container').append(
                                 that.$el.html(that.template({
                                     email: data.email,

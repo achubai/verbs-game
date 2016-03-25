@@ -172,3 +172,112 @@
 .b-users-table td img {
 	margin-right: 10px;
 }
+
+.test-counter,
+.b-before-start-timer {
+	text-align: center;
+	font-size: 24px;
+	color: #eea236;
+	line-height: 46px;
+}
+
+.b-test-block {
+	display: none;
+	width: 440px;
+	padding: 20px;
+	background-color: #fff;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	border: 1px solid #eee;
+	margin: 0 auto;
+}
+
+.b-test-block .correct-counter {
+	text-align: center;
+	margin-bottom: 5px;
+}
+.b-test-block .correct-counter .correct-item {
+	display: inline-block;
+}
+.b-test-block .correct-counter .correct-item .glyphicon {
+	vertical-align: top;
+	color: #eea236;
+}
+
+.b-test-block .correct-counter .correct-item .glyphicon-empty {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	-webkit-border-radius: 14px;
+	-moz-border-radius: 14px;
+	border-radius: 14px;
+	background-color: #eaeaea;
+}
+.b-test-block .error-container {
+	font-size: 24px;
+	height: 24px;
+	opacity: 0;
+	text-align: center;
+	color: #d43f3a;
+}
+.b-test-block input {
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.b-test-block .hint {
+	color: #ececec;
+	text-align: center;
+	font-size: 13px;
+}
+
+.b-start-container .hint {
+	margin-top: 15px;
+	font-size: 12px;
+	color: #ececec;
+}
+
+.b-rating-list {
+	width: 500px;
+	margin: 0 auto;
+	padding-top: 30px;
+}
+
+.b-rating-list .user-item {
+	margin-bottom: 20px;
+}
+
+.b-rating-list .user-item:first-child {
+	margin-left: -20px;
+	margin-right: -20px;
+}
+.b-rating-list .user-item:first-child .score {
+	line-height: 65px;
+	font-size: 24px;
+}
+
+.b-rating-list .user-item .score {
+	float: right;
+	line-height: 45px;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.b-rating-list .user-item .username {
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 16px;
+}
+
+.b-rating-list .user-item img {
+	-webkit-border-radius: 65px;
+	-moz-border-radius: 65px;
+	border-radius: 65px;
+	margin-right: 15px;
+	width: 45px;
+}
+
+.b-rating-list .user-item:first-child img {
+	width: 65px;
+}
