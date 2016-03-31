@@ -25,7 +25,7 @@ var app = express();
 
 app.use(express.static(__dirname + '/public'));
 app.set('db-uri', 'mongodb://localhost/verbs');
-
+//app.set('db-uri', 'mongodb://admin:mbrmL7VVPrBD@127.11.199.130:27017/');
 mongoose.connect(app.set('db-uri'));
 
 var verbSchema = new Schema({
@@ -111,6 +111,21 @@ var userSession = {
         }
     }
 };
+
+//router.route('/test')
+//    .post(function (req, res) {
+//
+//        for (i in vArr) {
+//            var newVerb = new Verb(vArr[i]);
+//
+//            newVerb.save(function (err) {
+//                if (err) {
+//                    res.json(err)
+//                }
+//            })
+//        }
+//
+//    });
 
 // not protected
 router.route('/verbs')
@@ -662,4 +677,14 @@ schedule.scheduleJob(rule, function(){
 });
 
 app.use('/api', router);
+
+app.use('/health', function (req, res) {
+    res.writeHead(200);
+    res.end();
+});
+
 app.listen(3000);
+
+//app.listen(8080 || 3000, 127.11.199.129 || 'localhost', function () {
+//    console.log('Application worker ${process.pid} started...');
+//});

@@ -5,7 +5,9 @@
   "main": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "build": "node C:/Users/achubai/AppData/Roaming/npm/node_modules/requirejs/bin/r.js -o ./build.js",
+    "get-verbs": "node get-verbs.js"
   },
   "repository": {
     "type": "git",
@@ -29,8 +31,6 @@
     "morgan": "^1.6.1",
     "node-schedule": "^0.6.0",
     "nodemailer": "^2.3.0",
-    "nodemailer-smtp-transport": "^2.4.1",
-    "passport": "^0.3.0",
-    "passport-local": "^1.0.0"
+    "nodemailer-smtp-transport": "^2.4.1"
   }
 }

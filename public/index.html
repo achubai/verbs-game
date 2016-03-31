@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>new</title>
 
-    <link rel="stylesheet" href="bower_components/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="styles/bootstrap.css">
     <link rel="stylesheet" href="styles/animate.css">
     <link rel="stylesheet" href="styles/main.css">
 
@@ -67,33 +67,37 @@
     <script data-main="scripts/main" src="scripts/libs/require.js"></script>
 
     <script type="text/template" id="verbs-list-template">
-        <div class="b-verbs-list verbs-tab-block">
-            <%
-            if (admin) {
-            %>
-                <a href="#verbs/create" class="btn btn-success">Add verb</a>
-            <%
-            }
-            %>
-            <table class="b-verbs-table table">
-                <thead>
-                    <tr>
-                        <th>v1</th>
-                        <th>v2</th>
-                        <th>v3</th>
-                        <th>translate</th>
-                        <th></th>
-                    </tr>
-                </thead>
-            </table>
+        <div class="b-search">
+            <input autofocus type="text" id="search" class="form-control"/>
         </div>
+
+        <%
+        if (admin) {
+        %>
+            <a href="#verbs/create" class="btn btn-success">Add verb</a>
+        <%
+        }
+        %>
+        <table class="b-verbs-table table">
+            <thead>
+                <tr>
+                    <th>v1</th>
+                    <th>v2</th>
+                    <th>v3</th>
+                    <th>translate</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </script>
+
     <script type="text/template" id="settings-template">
         <form id="user-settings-form">
             <div class="col-sm-6">
                 <div class="form-group">
                     <label for="">The number of words in training</label>
-                    <input type="number" min="3" step="3" name="verbsNumber" class="form-control" value="<%= number %>"/>
+                    <input type="number" min="3" max="99" step="3" name="verbsNumber" class="form-control" value="<%= number %>"/>
                 </div>
             </div>
 

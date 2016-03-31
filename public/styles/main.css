@@ -281,3 +281,7 @@
 .b-rating-list .user-item:first-child img {
 	width: 65px;
 }
+
+.b-search {
+	margin: 10px 0 25px;
+}

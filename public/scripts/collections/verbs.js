@@ -23,7 +23,7 @@ define([
             var found = false;
 
             if (gameLength === 'all') {
-                gameLength = this.length * 3;
+                gameLength = 90;
             }
 
             if(allRandom) {

@@ -13,10 +13,13 @@ define([
 ], function ($, _, Backbone, AllVerbsItem, VerbItemEditView, VerbModel) {
 
     return Backbone.View.extend({
-        tagName: 'tbody',
+        className: 'b-verbs-list verbs-tab-block',
         template: _.template($('#verbs-list-template').html()),
+        verbsArray: [],
+        events: {
+            'keyup #search': 'renderList'
+        },
         initialize: function () {
-
         },
         render: function () {
             var userData = localStorage.getItem('verbsUserData');
@@ -33,21 +36,37 @@ define([
 
             if(!$('.b-verbs-list').length) {
 
-                var that = this;
-                $('.b-verbs-container').append(this.template({admin: this.admin}));
+                $('.b-verbs-container').append(this.$el.html(this.template({admin: this.admin})));
 
-                this.collection.each(function (el) {
-                    var item = new AllVerbsItem({model: el});
+                this.$search = $('.b-verbs-container').find('#search');
 
-                    that.$el.append(item.el);
-                });
+                this.renderList();
 
-                $('.b-verbs-container').find('.b-verbs-table').append(this.$el)
 
                 return this;
             } else {
                 this.$el.parents('.b-verbs-list').show();
             }
+
+
+        },
+        renderList: function (e) {
+            var that = this;
+
+            while (this.verbsArray.length !== 0) {
+                this.verbsArray.pop().close();
+            }
+
+            this.collection.models.filter(function (el) {
+                return _.some(['v1', 'v2', 'v3', 'translate'], function (i) {
+                    return el.get(i).indexOf(that.$search.val()) != -1
+                });
+
+            }).forEach(function (el) {
+                var item = new AllVerbsItem({model: el});
+                that.verbsArray.push(item);
+                that.$el.find('tbody').append(item.el);
+            });
 
 
         },

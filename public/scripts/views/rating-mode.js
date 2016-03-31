@@ -27,6 +27,78 @@ define([
 
             this.userId = this.userData ? this.userData.id : null;
 
+
+            //this.verbs = [
+            //    {
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },
+            //    {
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },{
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },
+            //    {
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },{
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },
+            //    {
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },{
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },
+            //    {
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },{
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },
+            //    {
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },{
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    },
+            //    {
+            //        id:"56fbddc39fe007cc6dbb79da",
+            //        time:2,
+            //        translate:"??????????",
+            //        v2:"split"
+            //    }
+            //
+            //];
+
             this.verbs = this.collection.getVerbsArray(true, 'all');
             this.verb = verbsUtils.getRandomVerb(this.verbs).verb;
 
@@ -79,7 +151,7 @@ define([
                     that.beforeStartTimerCounter = that.beforeStartTimerCounter - 1;
 
                     if (that.beforeStartTimerCounter < 0) {
-                        clearInterval(interval);
+                        clearInterval(that.beforeStartTimerInterval);
                         that.$beforeStartTimer.hide();
                         that.$testCounter.show();
                         that.$testBlock.show();

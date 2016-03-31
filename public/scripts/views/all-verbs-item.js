@@ -37,6 +37,14 @@ define([
                     that.remove();
                 }
             });
+        },
+        close: function () {
+            this.unbind();
+            this.off(); // Unbind all local event bindings
+            this.stopListening();
+            this.remove(); // Remove view from DOM
+            delete this.$el; // Delete the jQuery wrapped object variable
+            delete this.el; // Delete the variable reference to this node
         }
 
     });
