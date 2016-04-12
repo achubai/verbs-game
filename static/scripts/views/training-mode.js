@@ -101,7 +101,7 @@ define([
 
                     this.gameProgress();
 
-                    if (verbsUtils.checkVerb(this.$input.val().trim(), this.verb['v' + this.time])) {
+                    if (verbsUtils.checkVerb(value, this.verb['v' + this.time])) {
                         this.successVerb = true;
                         this.successCount++;
                         this.successCounter('success');

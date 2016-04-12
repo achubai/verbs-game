@@ -4,8 +4,8 @@
 
 ({
     baseUrl: './scripts',
-    appDir: './public',
-    mainConfigFile: 'public/scripts/main.js',
+    appDir: './static',
+    mainConfigFile: 'static/scripts/main.js',
     dir: './dist',
     removeCombined: true,
     modules: [

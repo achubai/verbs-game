@@ -3,6 +3,7 @@
  */
 
 var express = require('express');
+var http = require('http');
 var mongoose = require('mongoose');
 var router = express.Router();
 var bodyParser = require('body-parser');
@@ -11,6 +12,8 @@ var schedule = require('node-schedule');
 var crypto = require('crypto-js');
 var nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
+var path = require('path');
+var env = process.env;
 var transporter = nodemailer.createTransport(smtpTransport({
     service: 'Gmail',
     auth: {
@@ -19,13 +22,19 @@ var transporter = nodemailer.createTransport(smtpTransport({
     }
 }));
 
-var SECRET = 'secret';
+var config = require('./config.js');
 
 var app = express();
+var server = http.createServer(app);
 
-app.use(express.static(__dirname + '/public'));
-app.set('db-uri', 'mongodb://localhost/verbs');
-//app.set('db-uri', 'mongodb://admin:mbrmL7VVPrBD@127.11.199.130:27017/');
+app.use(express.static(__dirname + '/static'));
+
+app.get('/', function(req, res) {
+    res.sendFile(path.resolve(__dirname + '/static/index.html'));
+});
+
+app.set('db-uri', config.DB_PATH);
+
 mongoose.connect(app.set('db-uri'));
 
 var verbSchema = new Schema({
@@ -112,25 +121,10 @@ var userSession = {
     }
 };
 
-//router.route('/test')
-//    .post(function (req, res) {
-//
-//        for (i in vArr) {
-//            var newVerb = new Verb(vArr[i]);
-//
-//            newVerb.save(function (err) {
-//                if (err) {
-//                    res.json(err)
-//                }
-//            })
-//        }
-//
-//    });
-
 // not protected
 router.route('/verbs')
     .get(function(req, res) {
-        Verb.find(function(err, verbs) {
+        Verb.find().sort({v1: 1}).exec(function(err, verbs) {
             if (err)
                 res.send(err);
 
@@ -519,7 +513,7 @@ function createToken (user, res) {
         time: (new Date()).getTime()
     };
 
-    var token = (crypto.AES.encrypt(JSON.stringify(tokenData), SECRET)).toString();
+    var token = (crypto.AES.encrypt(JSON.stringify(tokenData), config.SECRET)).toString();
 
     res.json({
         id: user._id,
@@ -549,7 +543,7 @@ function saveToken (data, res) {
 
 function decryptToken (token) {
 
-    var bytes  = crypto.AES.decrypt(token, SECRET);
+    var bytes  = crypto.AES.decrypt(token, config.SECRET);
     return  JSON.parse(bytes.toString(crypto.enc.Utf8));
 }
 
@@ -683,8 +677,6 @@ app.use('/health', function (req, res) {
     res.end();
 });
 
-app.listen(3000);
-
-//app.listen(8080 || 3000, 127.11.199.129 || 'localhost', function () {
-//    console.log('Application worker ${process.pid} started...');
-//});
+server.listen(config.PORT, config.IP, function () {
+    console.log('Application worker ${' + process.pid + '} started...');
+});

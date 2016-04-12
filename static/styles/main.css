@@ -173,6 +173,10 @@
 	margin-right: 10px;
 }
 
+.b-verbs-table tr:hover td {
+	background-color: #F0F5F5;
+}
+
 .test-counter,
 .b-before-start-timer {
 	text-align: center;

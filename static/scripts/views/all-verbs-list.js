@@ -36,18 +36,20 @@ define([
 
             if(!$('.b-verbs-list').length) {
 
-                $('.b-verbs-container').append(this.$el.html(this.template({admin: this.admin})));
+                $('.b-verbs-container').append(
+                    this.$el.html(
+                        this.template({admin: this.admin})
+                    )
+                );
 
-                this.$search = $('.b-verbs-container').find('#search');
+                this.$search = this.$el.find('#search');
 
                 this.renderList();
 
-
                 return this;
             } else {
-                this.$el.parents('.b-verbs-list').show();
+                this.$el.show();
             }
-
 
         },
         renderList: function (e) {
@@ -72,7 +74,7 @@ define([
         },
         renderOne: function (el) {
             var item = new AllVerbsItem({model: el});
-            this.$el.append(item.el);
+            this.$el.find('tbody').append(item.el);
         },
         addNew: function (model) {
             console.log('addNew');
