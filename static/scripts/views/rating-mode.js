@@ -9,6 +9,8 @@ define([
     '../utils/stats'
 ], function ($, _, Backbone, verbsUtils, statsUtils) {
 
+    'use strict';
+
     return Backbone.View.extend({
 
         className: 'b-rating verbs-tab-block',
@@ -21,14 +23,15 @@ define([
             this.listenTo(this, 'beforeTimerIsOut', this.startTest);
         },
         render: function () {
+            var model;
+
             this.resetTest();
 
             this.userData = JSON.parse(localStorage.getItem('verbsUserData'));
 
             this.userId = this.userData ? this.userData.id : null;
 
-
-            //this.verbs = [
+            // this.verbs = [
             //    {
             //        id:"56fbddc39fe007cc6dbb79da",
             //        time:2,
@@ -97,12 +100,12 @@ define([
             //        v2:"split"
             //    }
             //
-            //];
+            // ];
 
             this.verbs = this.collection.getVerbsArray(true, 'all');
             this.verb = verbsUtils.getRandomVerb(this.verbs).verb;
 
-            var model = _.extend(this.verb, {
+            model = _.extend(this.verb, {
                 user: this.userId
             });
 
@@ -113,6 +116,8 @@ define([
             return this;
         },
         beforeStartTest: function () {
+            var that = this;
+
             this.$startTestContainer = $('.b-start-container');
             this.$timeLine = $('.b-game-progress ');
             this.$beforeStartTimer = $('.b-before-start-timer');
@@ -138,8 +143,6 @@ define([
             this.statsList = [];
             this.successVerb = null;
 
-            var that = this;
-            var interval;
             this.$testCounter.text(this.mainCounter);
             this.$startTestContainer.addClass('bounceOut animated');
 
@@ -148,7 +151,7 @@ define([
                 that.$beforeStartTimer.show().text(that.beforeStartTimerCounter);
 
                 that.beforeStartTimerInterval = setInterval(function () {
-                    that.beforeStartTimerCounter = that.beforeStartTimerCounter - 1;
+                    that.beforeStartTimerCounter -= 1;
 
                     if (that.beforeStartTimerCounter < 0) {
                         clearInterval(that.beforeStartTimerInterval);
@@ -163,7 +166,7 @@ define([
                         that.$beforeStartTimer.show().text(that.beforeStartTimerCounter);
                     }
 
-                }, 1000)
+                }, 1000);
             }, 1000);
 
             this.$timeLine.find('.progress-bar').width('100%').text(this.timerCount);
@@ -182,13 +185,13 @@ define([
             var that = this;
 
             this.timer = setInterval(function () {
-                that.timerCount = that.timerCount - 1;
+                that.timerCount -= 1;
 
                 if (that.timerCount < 0) {
                     that.endTest();
                     clearInterval(that.timer);
                 } else {
-                    that.$timeLine.find('.progress-bar').width( 100 / 60 * that.timerCount + '%').text(that.timerCount);
+                    that.$timeLine.find('.progress-bar').width(100 / 60 * that.timerCount + '%').text(that.timerCount);
                 }
 
             }, 1000);
@@ -203,13 +206,13 @@ define([
             this.sendResult();
         },
         checkVerb: function (e) {
-            if (e.keyCode == 13) {
+            if (e.keyCode === 13) {
                 if (this.$input.val().trim() !== '') {
                     if (verbsUtils.checkVerb(this.$input.val().trim(), this.verb['v' + this.verb.time])) {
                         this.isCorrect();
                     } else {
-                        //this.isCorrect();
-                        this.isIncorrect()
+                        // this.isCorrect();
+                        this.isIncorrect();
                     }
 
                     this.catchStats(this.successVerb);
@@ -219,8 +222,8 @@ define([
         },
         isCorrect: function () {
             this.playAudio(this.$audioCorrect);
-            this.inSuccessionMainCounter +=1;
-            this.inSuccessionCounter +=1;
+            this.inSuccessionMainCounter += 1;
+            this.inSuccessionCounter += 1;
             this.successVerb = true;
             this.updateInSuccessionCounter();
             this.updateMainCounter();
@@ -236,14 +239,13 @@ define([
             this.updateBonusText();
         },
         updateInSuccessionCounter: function () {
-            var that = this;
+            var that = this,
+                icon;
 
             this.$correctCounter.find('.correct-item').each(function (i, el) {
-                if (i + 1 <= that.inSuccessionCounter) {
-                    $(el).find('.glyphicon').removeClass('glyphicon-empty glyphicon-ok-sign').addClass('glyphicon-ok-sign')
-                } else {
-                    $(el).find('.glyphicon').removeClass('glyphicon-empty glyphicon-ok-sign').addClass('glyphicon-empty')
-                }
+                icon = i + 1 <= that.inSuccessionCounter ? 'glyphicon-ok-sign' : 'glyphicon-empty';
+
+                $(el).find('.glyphicon').removeClass('glyphicon-empty glyphicon-ok-sign').addClass(icon);
             });
         },
         updateMainCounter: function () {
@@ -288,7 +290,7 @@ define([
             var verbStats = {};
 
             verbStats.userId = this.userId;
-            verbStats.verbId = this.verb._id ;
+            verbStats.verbId = this.verb._id;
             verbStats.verbForm = this.verb.time;
             verbStats.usedHint = false;
             verbStats.success = success;
@@ -346,6 +348,5 @@ define([
         }
 
 
-    })
-
+    });
 });

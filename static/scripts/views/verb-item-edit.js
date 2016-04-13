@@ -7,6 +7,8 @@ define([
     'backbone'
 ], function ($, _, Backbone) {
 
+    'use strict';
+
     return Backbone.View.extend({
 
         el: '#verb-edit-modal .modal-content',
@@ -51,7 +53,7 @@ define([
                 this.trigger('addNewModel', this.model.toJSON());
             } else {
 
-                this.model.save({error: function(){
+                this.model.save({error: function () {
                     console.log('can not be saved');
                 }});
             }

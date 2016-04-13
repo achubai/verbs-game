@@ -3,9 +3,12 @@
  */
 
 define([
+    'underscore',
     'backbone',
     '../models/verb'
-], function (Backbone, VerbModel) {
+], function (_, Backbone, VerbModel) {
+
+    'use strict';
 
     return Backbone.Collection.extend({
         model: VerbModel,
@@ -18,47 +21,51 @@ define([
             });
         },
         getVerbsArray: function (allRandom, gameLength) {
-            var allRandomVerbs = [];
-            var verb;
-            var found = false;
+            var verb,
+                allRandomVerbs = [],
+                found = false,
+                verbTime,
+                obj;
 
             if (gameLength === 'all') {
                 gameLength = 90;
             }
 
-            if(allRandom) {
+            if (allRandom) {
                 while (allRandomVerbs.length < gameLength) {
+
                     verb = this.models[_.random(this.models.length - 1)];
-                    var verbTime = _.random(1, 3);
-                    var obj = {
-                        _id:   verb.get('_id'),
+                    verbTime = _.random(1, 3);
+                    obj = {
+                        _id: verb.get('_id'),
                         translate: verb.get('translate'),
                         time: verbTime
                     };
 
                     obj['v' + verbTime] = verb.get('v' + verbTime);
 
-                    found = _.find(allRandomVerbs, function (el) {
-                        return _.isEqual(el, obj);
-                    });
+                    found = _.findWhere(allRandomVerbs, obj);
 
-                    if (!found) allRandomVerbs.push(obj);
+                    if (!found) {
+                        allRandomVerbs.push(obj);
+                    }
                     found = false;
                 }
             } else {
                 while (allRandomVerbs.length < (gameLength / 3)) {
                     verb = this.toJSON()[_.random(this.models.length - 1)];
-                    found = _.find(allRandomVerbs, function (el) {
-                        return _.isEqual(el, verb);
-                    });
+                    found = _.findWhere(allRandomVerbs, verb);
 
-                    if (!found) allRandomVerbs.push(verb);
+                    if (!found) {
+                        allRandomVerbs.push(verb);
+                    }
                     found = false;
                 }
             }
 
+            debugger;
+
             return allRandomVerbs;
         }
     });
-
 });

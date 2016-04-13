@@ -7,6 +7,8 @@ define([
     'backbone'
 ], function ($, _, Backbone) {
 
+    'use strict';
+
     return Backbone.View.extend({
 
         el: '#signin-modal .modal-content',
@@ -20,7 +22,7 @@ define([
             'click a[href="#forgot"]': 'close'
         },
         render: function () {
-            if(!this.isRendered) {
+            if (!this.isRendered) {
                 this.$modal = $('#signin-modal');
                 this.$el.append(this.template());
 
@@ -36,15 +38,15 @@ define([
             window.router.navigate('', {trigger: true});
         },
         sendData: function (e) {
-            if(this.validate()) {
-                var that = this;
-                var $form = $(e.currentTarget);
+            var that = this,
+                $form = $(e.currentTarget);
 
+            if (this.validate()) {
                 $.ajax({
-                    method: "POST",
+                    method: 'POST',
                     url: '/api/signin',
                     data: $form.serialize(),
-                    success: function(data) {
+                    success: function (data) {
                         if (data.err) {
                             that.validate(data.err, data.message);
                         } else {
@@ -53,7 +55,7 @@ define([
 
                             that.trigger('reRenderMenu', that);
                             that.trigger('reRenderVerbsList', that);
-                            that.trigger('renderHoneView', that);
+                            that.trigger('renderHomeView', that);
                         }
                     }
                 });
@@ -61,12 +63,12 @@ define([
             return false;
         },
         validate: function (err, message) {
+            var that = this,
+                $formLine;
 
-            var that = this;
             this.errors = 0;
-            if (err) {
-                var $formLine;
 
+            if (err) {
                 if (err === 'user') {
                     $formLine = this.$el.find('#signin-name').parents('.form-group');
 
@@ -81,10 +83,10 @@ define([
             } else {
                 _.each(this.$el.find('.form-control'), function (el) {
                     $(el).parents('.form-group').removeClass('has-error');
-                    if ($(el).val() == '') {
+                    if ($(el).val() === '') {
                         $(el).parents('.form-group').addClass('has-error');
 
-                        that.errors++;
+                        that.errors += 1;
                     }
                 });
 

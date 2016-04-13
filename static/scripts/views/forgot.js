@@ -8,6 +8,8 @@ define([
     'backbone'
 ], function ($, _, Backbone) {
 
+    'use strict';
+
     return Backbone.View.extend({
 
         el: '#forgot-modal .modal-content',
@@ -20,7 +22,7 @@ define([
             'submit #forgot-form': 'sendData'
         },
         render: function () {
-            if(!this.isRendered) {
+            if (!this.isRendered) {
                 this.$modal = $('#forgot-modal');
                 this.$el.append(this.template());
 
@@ -36,8 +38,8 @@ define([
             window.router.navigate('', true);
         },
         sendData: function (e) {
-            var that = this;
-            var $form = $(e.currentTarget);
+            var that = this,
+                $form = $(e.currentTarget);
 
             $.ajax({
                 method: 'POST',
@@ -45,14 +47,14 @@ define([
                 data: $form.serialize(),
                 success: function (data) {
                     if (data.err) {
-                        that.throwError(data.err, data.message)
+                        that.throwError(data.err, data.message);
                     } else {
                         that.clearForm();
                         that.close();
                         window.router.trigger('showAlert', {
                             type: 'success',
                             text: data.message
-                        })
+                        });
                     }
                 }
             });

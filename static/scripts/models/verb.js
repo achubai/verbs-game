@@ -6,15 +6,16 @@ define([
     'backbone'
 ], function (Backbone) {
 
+    'use strict';
+
     return Backbone.Model.extend({
         idAttribute: '_id',
         default: {
-            v1 : '',
-            v2 : '',
-            v3 : '',
-            ing : '',
-            translate : ''
+            v1: '',
+            v2: '',
+            v3: '',
+            ing: '',
+            translate: ''
         }
     });
-
 });

@@ -6,7 +6,9 @@ define([
     'jquery',
     'underscore',
     'backbone'
-], function($, _, Backbone) {
+], function ($, _, Backbone) {
+
+    'use strict';
 
     return Backbone.View.extend({
 
@@ -19,12 +21,14 @@ define([
             this.render();
         },
         render: function () {
+            var data;
+
             this.userData = localStorage.getItem('verbsUserData');
 
             if (this.userData) {
-                var data = JSON.parse(this.userData);
+                data = JSON.parse(this.userData);
 
-                if(data.permission === "admin") {
+                if (data.permission === 'admin') {
                     this.auth = true;
                     this.admin = true;
                 } else {
@@ -50,7 +54,7 @@ define([
 
             this.$nav.find('li').removeClass('active');
 
-            if (route == '') {
+            if (route === '') {
                 this.$nav.find('a[href=#' + route + ']').parents('li').addClass('active');
             } else {
                 route = route.indexOf('/') === -1 ? route : route.substring(0, route.indexOf('/'));
@@ -64,15 +68,15 @@ define([
             $.ajax({
                 method: 'POST',
                 url: '/api/logout',
-                success: function (data) {
+                success: function () {
                     localStorage.removeItem('verbsUserData');
 
                     that.trigger('reRenderMenu', that);
                     that.trigger('reRenderVerbsList', that);
-                    that.trigger('renderHoneView', that);
+                    that.trigger('renderHomeView', that);
                 }
 
-            })
+            });
         }
     });
 

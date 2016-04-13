@@ -7,6 +7,8 @@ define([
     'backbone'
 ], function ($, _, Bacbone) {
 
+    'use strict';
+
     return Bacbone.View.extend({
         className: 'b-rating-list verbs-tab-block',
         template: _.template($('#rating-list-template').html()),
@@ -32,7 +34,7 @@ define([
                                 that.$el.append(that.template({
                                     username: el.user.username,
                                     score: el.score
-                                }))
+                                }));
                             });
 
                             $('.b-verbs-container').append(that.$el);
@@ -49,6 +51,6 @@ define([
 
             return this;
         }
-    })
+    });
 
 });

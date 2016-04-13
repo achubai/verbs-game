@@ -5,8 +5,13 @@ define([
     'jquery'
 ], function ($) {
 
-    function sendStats (statsList) {
+    'use strict';
 
+    /**
+     * send stats array after test
+     * @param {Array} statsList - collection of stats
+     * */
+    function sendStats (statsList) {
         $.ajax({
             method: 'POST',
             url: 'api/stats',
@@ -33,6 +38,6 @@ define([
     }
 
     return {
-        sendStats : sendStats
-    }
+        sendStats: sendStats
+    };
 });

@@ -52,9 +52,6 @@ define([
             }
         },
         render: function () {
-
-            this.beforeRender();
-
             var model = _.extend(this.verb, {
                 time: this.time,
                 verb: this.verb['v' + this.time],
@@ -62,6 +59,7 @@ define([
                 success: this.successCount
             });
 
+            this.beforeRender();
 
             this.$el.show();
 
@@ -86,24 +84,26 @@ define([
             this.verbs = newData.verbs;
             this.verb = newData.verb;
 
-            if (this.verbs.length != 0) {
-                return this.verb;
-            } else {
+            if (this.verbs.length === 0) {
                 this.endGame();
+            } else {
+                return this.verb;
             }
         },
         checkVerb: function (e) {
-            if (e.keyCode == 13) {
-                var value = this.$input.val().trim();
+            var value;
 
-                if (value != '') {
-                    this.gameCount++;
+            if (e.keyCode === 13) {
+                value = this.$input.val().trim();
+
+                if (value !== '') {
+                    this.gameCount += 1;
 
                     this.gameProgress();
 
                     if (verbsUtils.checkVerb(value, this.verb['v' + this.time])) {
                         this.successVerb = true;
-                        this.successCount++;
+                        this.successCount += 1;
                         this.successCounter('success');
                     } else {
                         this.successVerb = false;
@@ -114,7 +114,7 @@ define([
                             translation: this.verb.translate,
                             answer: this.verb['v' + this.time].toLowerCase(),
                             user: value.toLowerCase()
-                        })
+                        });
                     }
 
                     this.catchStats(this.successVerb);
@@ -129,7 +129,7 @@ define([
                 this.newTime();
             } else {
                 this.newTime();
-                if (this.time == 1) {
+                if (this.time === 1) {
                     this.getRandomVerb(this.verb);
                 }
             }
@@ -139,11 +139,11 @@ define([
             }
         },
         newTime: function () {
-            if(this.gameAllRandom) {
+            if (this.gameAllRandom) {
                 this.time = this.verb['time'];
             } else {
                 this.time = (this.time % 3);
-                this.time++;
+                this.time += 1;
             }
         },
         renderNew: function () {
@@ -157,14 +157,14 @@ define([
             this.$input.val('').focus();
         },
         endGame: function () {
+            var that = this;
+
             this.$title.html('You have ' + Math.round(this.getPercent((this.gameCount - this.successCount), this.gameCount)) + '% errors');
             this.$input.hide();
             this.$bntPlayAgain.show().focus();
 
-            var that = this;
-
             _.each(this.errorsList, function (model) {
-                that.$errorsList.append(that.errorsListItemTemplate(model))
+                that.$errorsList.append(that.errorsListItemTemplate(model));
             });
 
             statsUtils.sendStats(this.statsList);
@@ -175,18 +175,17 @@ define([
             this.$progress.find('.progress-bar').text(this.gameCount + ' / ' + this.gameLength).width(progress + '%');
         },
         successCounter: function (status) {
-            var num = status == 'success' ? this.successCount : this.gameCount - this.successCount;
+            var that = this,
+                num = status === 'success' ? this.successCount : this.gameCount - this.successCount;
 
             this.$counter.find('.line-' + status).find('.value').text(num);
             this.$counter.find('.line-' + status).find('.glyphicon').addClass('bounce');
 
-            var that = this;
-
             setTimeout(function () {
                 that.$counter.find('.line-' + status).find('.glyphicon').removeClass('bounce');
-            },1500);
+            }, 1500);
         },
-        getPercent: function (y , x) {
+        getPercent: function (y, x) {
             return (y / x) * 100;
         },
         gameReset: function () {
@@ -210,7 +209,7 @@ define([
             var verbStats = {};
 
             verbStats.userId = this.userId;
-            verbStats.verbId = this.verb._id ;
+            verbStats.verbId = this.verb._id;
             verbStats.verbForm = this.time;
             verbStats.usedHint = this.usedHint;
             verbStats.success = success;
@@ -219,5 +218,4 @@ define([
         }
 
     });
-
 });

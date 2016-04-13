@@ -9,6 +9,8 @@ define([
     '../views/users-list-item'
 ], function ($, _, Backbone, UserItemView) {
 
+    'use strict';
+
     return Backbone.View.extend({
         tagName: 'tbody',
         template: _.template($('#users-list-template').html()),
@@ -23,7 +25,7 @@ define([
         render: function () {
             var that = this;
 
-            if(!this.isRendered) {
+            if (!this.isRendered) {
                 if (this.collection) {
                     $('.b-verbs-container').append(this.template());
                     _.each(this.collection, function (user) {
@@ -42,8 +44,6 @@ define([
                 }
             }
 
-
-
             this.$el.parents('.b-users').show();
 
             return false;
@@ -59,13 +59,12 @@ define([
                     that.collection = data.users;
 
                     if (typeof callback === 'function') {
-                        callback.call(that)
+                        callback.call(that);
                     }
                 }
             });
 
             return false;
         }
-    })
-
+    });
 });

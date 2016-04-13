@@ -8,6 +8,8 @@ define([
     'backbone'
 ], function ($, _, Backbone) {
 
+    'use strict';
+
     return Backbone.View.extend({
         tagName: 'tr',
         template: _.template($('#users-list-item-template').html()),
@@ -26,6 +28,5 @@ define([
 
             return this;
         }
-    })
-
+    });
 });

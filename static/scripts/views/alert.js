@@ -7,6 +7,8 @@ define([
     'backbone'
 ], function ($, _, Backbone) {
 
+    'use strict';
+
     return Backbone.View.extend({
         className: 'alert',
         template: _.template($('#alert-template').html()),
@@ -20,8 +22,8 @@ define([
             var that = this;
 
             if (option) {
-                this.alertType = option.type || 'danger',
-                this.alertText = option.text || ''
+                this.alertType = option.type || 'danger';
+                this.alertText = option.text || '';
             }
 
             this.$el.addClass('alert-' + this.alertType);
@@ -56,6 +58,6 @@ define([
 
             return this;
         }
-    })
+    });
 
 });

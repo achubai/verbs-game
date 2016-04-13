@@ -8,6 +8,8 @@ define([
     '../views/settings'
 ], function ($, _, Backbone, SettingsView) {
 
+    'use strict';
+
     return Backbone.View.extend({
         className: 'b-profile verbs-tab-block',
         template: _.template($('#profile-template').html()),
@@ -19,13 +21,14 @@ define([
             this.isRendered = false;
         },
         render: function (callback) {
+            var localData = JSON.parse(localStorage.getItem('verbsUserData')),
+                that = this;
 
-            var localData = JSON.parse(localStorage.getItem('verbsUserData'));
             this.userId = localData ? localData.id : '';
 
             if (!this.isRendered) {
                 if (!$('.b-profile').length) {
-                    var that = this;
+
                     $.ajax({
                         method: 'GET',
                         url: '/api/users/' + that.userId,
@@ -55,10 +58,10 @@ define([
 
         },
         changePassword: function (e) {
-            var $form = $(e.currentTarget);
+            var that = this,
+                $form = $(e.currentTarget);
 
-            if(!this.validatePassword()) {
-                var that = this;
+            if (!this.validatePassword()) {
 
                 $.ajax({
                     method: 'PUT',
@@ -88,10 +91,10 @@ define([
             _.each(this.$el.find('#change-password-form .form-control'), function (el) {
                 $(el).parents('.form-group').removeClass('has-error');
                 $(el).parents('.form-group').find('.help-block').text('');
-                if ($(el).val() == '') {
+                if ($(el).val() === '') {
 
                     that.throwError($(el).attr('name'), 'Fill the area');
-                    that.errors++;
+                    that.errors += 1;
 
                 }
             });
@@ -108,8 +111,8 @@ define([
             });
         },
         activateTab: function () {
-            var href = window.location.hash.replace('#', '');
-            var $tab = this.$el.find('.b-profile-main > .nav > li a[href="#' + href + '"]');
+            var href = window.location.hash.replace('#', ''),
+                $tab = this.$el.find('.b-profile-main > .nav > li a[href="#' + href + '"]');
 
             this.$el.find('.b-profile-main > .nav > li').removeClass('active');
             $tab.closest('li').addClass('active');
@@ -125,5 +128,5 @@ define([
         showStatistics: function () {
             console.log('showStatistics');
         }
-    })
+    });
 });

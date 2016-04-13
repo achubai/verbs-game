@@ -8,6 +8,8 @@ define([
     'backbone'
 ], function ($, _, Backbone) {
 
+    'use strict';
+
     return Backbone.View.extend({
         className: 'b-admin verbs-tab-block',
         template: _.template($('#admin-template').html()),
@@ -32,11 +34,10 @@ define([
             return false;
         },
         changePassword: function (e) {
-            var $form = $(e.currentTarget);
+            var $form = $(e.currentTarget),
+                that = this;
 
-            if(!this.validatePassword()) {
-                var that = this;
-
+            if (!this.validatePassword()) {
                 $.ajax({
                     method: 'PUT',
                     url: 'api/users/' + that.userId + '/password',
@@ -65,10 +66,10 @@ define([
             _.each(this.$el.find('#change-password-form .form-control'), function (el) {
                 $(el).parents('.form-group').removeClass('has-error');
                 $(el).parents('.form-group').find('.help-block').text('');
-                if ($(el).val() == '') {
+                if ($(el).val() === '') {
 
                     that.throwError($(el).attr('name'), 'Fill the area');
-                    that.errors++;
+                    that.errors += 1;
 
                 }
             });
@@ -84,6 +85,6 @@ define([
                 $(el).find('.form-control').val('');
             });
         }
-    })
+    });
 
 });

@@ -8,6 +8,8 @@ define([
     'backbone'
 ], function ($, _, Backbone) {
 
+    'use strict';
+
     return Backbone.View.extend({
         className: 'b-settings-container',
         template: _.template($('#settings-template').html()),
@@ -18,7 +20,7 @@ define([
         },
         initialize: function () {
             this.isRendered = false;
-            this.beforeSendTimeout;
+            this.beforeSendTimeout = null;
         },
         render: function () {
             this.userData = JSON.parse(localStorage.getItem('verbsUserData'));
@@ -38,8 +40,8 @@ define([
             return false;
         },
         setSettings: function () {
-            var that = this;
-            var $form = this.$el.find('#user-settings-form');
+            var that = this,
+                $form = this.$el.find('#user-settings-form');
 
             this.validateSettings();
 
@@ -74,8 +76,8 @@ define([
         },
         validateSettings: function () {
             var newVal = Math.round(this.$el.find('input[name="verbsNumber"]').val() / 3) * 3;
+
             this.$el.find('input[name="verbsNumber"]').val(newVal < 3 ? 3 : newVal);
         }
     });
-    
 });

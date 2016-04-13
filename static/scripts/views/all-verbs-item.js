@@ -8,6 +8,8 @@ define([
 
 ], function ($, _, Backbone) {
 
+    'use strict';
+
     return Backbone.View.extend({
         tagName: 'tr',
         template: _.template($('#verbs-item').html()),
@@ -19,7 +21,7 @@ define([
             'click .remove': 'deleteModel'
         },
         render: function () {
-            var admin = JSON.parse(localStorage.getItem('verbsUserData')) ? JSON.parse(localStorage.getItem('verbsUserData')).permission : 'user' ;
+            var admin = JSON.parse(localStorage.getItem('verbsUserData')) ? JSON.parse(localStorage.getItem('verbsUserData')).permission : 'user';
 
             this.$el.html(this.template(_.extend(this.model.toJSON(), {
                 admin: admin
@@ -28,8 +30,9 @@ define([
             return this;
         },
         deleteModel: function (e) {
-            e.preventDefault();
             var that = this;
+
+            e.preventDefault();
 
             this.model.destroy({
                 success: function () {
