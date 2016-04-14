@@ -217,7 +217,11 @@ router.route('/stats')
             if (err) {
                 res.json({
                     err: err
-                });
+                })
+            } else {
+                res.json({
+                    message: 'ok'
+                })
             }
         });
     });
@@ -308,7 +312,11 @@ router.route('/rating')
                     if (err) {
                         res.json({
                             err: err
-                        });
+                        })
+                    } else {
+                        res.json({
+                            message: 'ok'
+                        })
                     }
                 });
             }
@@ -637,23 +645,22 @@ function checkRegistrationLoginExist(req, res, next){
 }
 
 function saveStats (statsList, ratingId, testId, callback) {
+    var date = new Date();
 
     if (statsList) {
-        statsList.forEach(function (el) {
-            var stats = new Stats();
 
-            stats.testId = testId;
-            stats.verbId = el.verbId;
-            stats.userId = el.userId || null;
-            stats.verbForm = el.verbForm;
-            stats.success = el.success;
-            stats.ratingId = ratingId;
-            stats.usedHint = el.usedHint;
-            stats.date = new Date();
+        statsList.map(function (el) {
+            el.date = date;
+            el.testId = testId;
+            el.ratingId = ratingId;
+            el.userId = el.userId || null;
 
-            stats.save(callback)
+            return el;
         });
+
+        Stats.collection.insert(statsList, callback());
     }
+
 }
 
 var rule = new schedule.RecurrenceRule();

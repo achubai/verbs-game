@@ -63,8 +63,6 @@ define([
                 }
             }
 
-            debugger;
-
             return allRandomVerbs;
         }
     });
