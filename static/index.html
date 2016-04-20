@@ -219,19 +219,19 @@
             <form id="signin-form" class="b-auth-form">
                 <div class="form-group has-feedback">
                     <label class="control-label" for="signin-name">Username</label>
-                    <input type="text" class="form-control" id="signin-name" name="username">
+                    <input type="text" class="form-control" id="signin-name" name="username" tabindex="1">
                     <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
                     <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
                     <span class="help-block">Insert username</span>
                 </div>
                 <div class="form-group has-feedback">
-                    <label class="control-label" for="signin-pass">Password <a href="#forgot">(forgot password)</a></label>
-                    <input type="password" class="form-control" id="signin-pass" name="password">
+                    <label class="control-label" for="signin-pass">Password <a href="#forgot" tabindex="3">(forgot password)</a></label>
+                    <input type="password" class="form-control" id="signin-pass" name="password" tabindex="2">
                     <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
                     <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
                     <span class="help-block">Insert password</span>
                 </div>
-                <button type="submit" class="btn btn-success">Sign in</button>
+                <button type="submit" class="btn btn-success" tabindex="4">Sign in</button>
             </form>
         </div>
     </script>
@@ -426,18 +426,19 @@
     </script>
 
     <script type="text/template" id="users-list-template">
-        <div class="b-users verbs-tab-block">
-            <table class="b-users-table table">
-                <thead>
+
+        <table class="b-users-table table">
+            <thead>
                 <tr>
                     <th class="name-title">Name</th>
                     <th>Email</th>
                     <th>Permission</th>
                     <th>Start date</th>
                 </tr>
-                </thead>
-            </table>
-        </div>
+            </thead>
+            <tbody></tbody>
+        </table>
+
     </script>
     <script type="text/template" id="users-list-item-template">
 

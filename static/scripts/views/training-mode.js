@@ -5,13 +5,15 @@
 define([
     'jquery',
     'underscore',
-    'backbone',
+    '../utils/base-view',
     '../utils/verbs',
     '../utils/stats',
     'bootstrap'
-], function ($, _, Backbone, verbsUtils, statsUtils) {
+], function ($, _, BaseView, verbsUtils, statsUtils) {
 
-    return Backbone.View.extend({
+    'use strict';
+
+    return BaseView.extend({
         className: 'b-home verbs-tab-block',
         template: _.template($('#home-template').html()),
         errorsListItemTemplate: _.template($('#game-errors-list-item').html()),
@@ -215,6 +217,9 @@ define([
             verbStats.success = success;
 
             this.statsList.push(verbStats);
+        },
+        show: function () {
+            this.render();
         }
 
     });

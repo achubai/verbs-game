@@ -7,6 +7,8 @@ define([
     'backbone'
 ], function ($, _, Backbone) {
 
+    'use strict';
+
     return Backbone.View.extend({
 
         el: '#join-modal .modal-content',
@@ -19,7 +21,7 @@ define([
             'submit #join-form': 'sendData'
         },
         render: function () {
-            if(!this.isRendered) {
+            if (!this.isRendered) {
                 this.$modal = $('#join-modal');
                 this.$el.append(this.template());
 
@@ -31,20 +33,20 @@ define([
             return this;
         },
         close: function () {
-            this.$modal.modal('hide');
-            window.router.navigate('', {trigger: true});
+            window.router.goToPreviousRoute();
         },
         sendData: function (e) {
-            if(this.validate()) {
-                var that = this;
-                var $form = $(e.currentTarget);
+            var that = this,
+                $form = $(e.currentTarget);
+
+            if (this.validate()) {
 
                 $.ajax({
-                    method: "POST",
+                    method: 'POST',
                     url: '/api/users',
                     data: $form.serialize(),
 
-                    success: function(data) {
+                    success: function (data) {
                         if (data.err) {
                             that.validate(data.err, data.message);
                         } else {
@@ -61,11 +63,12 @@ define([
             return false;
         },
         validate: function (err, message) {
-            var that = this;
+            var that = this,
+                $formLine;
+
             this.errors = 0;
 
             if (err) {
-                var $formLine;
 
                 if (err === 'user') {
                     $formLine = this.$el.find('#join-name').parents('.form-group');
@@ -82,16 +85,16 @@ define([
                 _.each(this.$el.find('.form-control'), function (el) {
                     $(el).parents('.form-group').removeClass('has-error');
 
-                    if ($(el).attr('id') != 'join-confirm-pass') {
-                        if ($(el).val() == '') {
+                    if ($(el).attr('id') !== 'join-confirm-pass') {
+                        if ($(el).val() === '') {
                             $(el).parents('.form-group').addClass('has-error');
 
-                            that.errors++;
+                            that.errors += 1;
                         }
                     } else {
-                        if ($(el).val() != that.$el.find('#join-pass').val()) {
+                        if ($(el).val() !== that.$el.find('#join-pass').val()) {
                             $(el).parents('.form-group').addClass('has-error');
-                            that.errors++;
+                            that.errors += 1;
                         }
                     }
                 });

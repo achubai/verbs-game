@@ -5,12 +5,12 @@
 define([
     'jquery',
     'underscore',
-    'backbone'
-], function ($, _, Backbone) {
+    '../utils/base-view'
+], function ($, _, BaseView) {
 
     'use strict';
 
-    return Backbone.View.extend({
+    return BaseView.extend({
         className: 'b-settings-container',
         template: _.template($('#settings-template').html()),
         events: {
@@ -19,23 +19,20 @@ define([
             'submit #user-settings-form': 'setSettings'
         },
         initialize: function () {
-            this.isRendered = false;
             this.beforeSendTimeout = null;
         },
         render: function () {
             this.userData = JSON.parse(localStorage.getItem('verbsUserData'));
 
-            if (!this.isRendered) {
-                $('#user-settings').append(this.$el.html(
-                    this.template({
-                        number: this.userData.settings.verbs.number,
-                        complexity: this.userData.settings.verbs.complexity
-                    })
-                ));
-                this.isRendered = true;
+            $('#user-settings').append(this.$el.html(
+                this.template({
+                    number: this.userData.settings.verbs.number,
+                    complexity: this.userData.settings.verbs.complexity
+                })
+            ));
+            this.isRendered = true;
 
-                return this;
-            }
+            return this;
 
             return false;
         },

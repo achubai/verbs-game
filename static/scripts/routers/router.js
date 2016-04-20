@@ -79,6 +79,9 @@ define([
     
     
     Router = Backbone.Router.extend({
+        previousRoute: null,
+        currentRoute: null,
+        currentPopup: null,
         routes: {
             '': 'index',
             'verbs': 'allVerbs',
@@ -102,70 +105,63 @@ define([
             this.listenToOnce(this.collection, 'verbsCollectionFetched', this.started);
         },
         started: function () {
+            this.ratingModeView = new RatingModeView({collection: this.collection});
             this.allVerbsView = new AllVerbsView({collection: this.collection});
             this.trainingModeView = new TrainingModeView({collection: this.collection});
             this.mainMenuView = new MainMenuView();
-            this.joinView = new JoinView({model: new UserModel()});
-            this.signinView = new SigninView();
-            this.profileView = new ProfileModel();
-            this.forgotView = new ForgotView();
-            this.adminView = new AdminView();
-            this.usersListView = new UsersListView();
-            this.ratingModeView = new RatingModeView({collection: this.collection});
-            this.ratingListView = new RatingListView();
 
             Backbone.history.start();
 
             this.listenTo(this, 'route', this.getRout);
-            this.getRout();
-
             this.listenTo(this, 'showAlert', this.alertRender, this);
+            this.bindListenersOnLogin(this.mainMenuView);
 
-            this.listenTo(this.signinView, 'reRenderMenu', this.mainMenuReRender);
-            this.listenTo(this.signinView, 'reRenderVerbsList', this.allVerbsRender);
-            this.listenTo(this.signinView, 'renderHomeView', this.index);
-
-            this.listenTo(this.joinView, 'reRenderMenu', this.mainMenuReRender);
-            this.listenTo(this.joinView, 'reRenderVerbsList', this.allVerbsRender);
-            this.listenTo(this.joinView, 'renderHomeView', this.index);
-
-            this.listenTo(this.mainMenuView, 'reRenderMenu', this.mainMenuReRender);
-            this.listenTo(this.mainMenuView, 'reRenderVerbsList', this.allVerbsRender);
-            this.listenTo(this.mainMenuView, 'renderHomeView', this.index);
+            this.getRout();
         },
-
 
         // routers
         index: function () {
-            this.resetTest();
-            this.hideAllTabs();
-            this.trainingModeView.render();
+            this.changeView(this.trainingModeView);
         },
         allVerbs: function () {
-            this.resetTest();
-            this.hideAllTabs();
-            this.allVerbsView.render();
+            this.changeView(this.allVerbsView);
         },
         join: function () {
-            this.resetTest();
-            this.joinView.render();
+            if (typeof this.joinView === 'undefined') {
+                this.joinView = new JoinView({model: new UserModel()});
+
+                this.bindListenersOnLogin(this.joinView);
+            }
+
+            this.showPopup(this.joinView);
         },
         signin: function () {
-            this.resetTest();
-            this.signinView.render();
+            if (typeof this.signinView === 'undefined') {
+                this.signinView = new SigninView();
+
+                this.bindListenersOnLogin(this.signinView);
+            }
+
+            this.showPopup(this.signinView);
         },
         forgot: function () {
-            this.resetTest();
-            this.forgotView.render();
+            if (typeof this.forgotView === 'undefined') {
+                this.forgotView = new ForgotView();
+            }
+
+            this.showPopup(this.forgotView);
         },
         profile: function () {
-            this.resetTest();
-            this.hideAllTabs();
-            this.profileView.render();
+            if (typeof this.profileView === 'undefined') {
+                this.profileView = new ProfileModel();
+            }
+
+            this.changeView(this.profileView);
         },
         settings: function () {
-            this.resetTest();
-
+            if (typeof this.profileView === 'undefined') {
+                this.profileView = new ProfileModel();
+            }
             if (this.profileView.isRendered) {
                 this.profileView.activateTab();
                 this.profileView.showSettings();
@@ -176,29 +172,32 @@ define([
 
         },
         statistics: function () {
-            this.resetTest();
             this.profile();
             this.profileView.showStatistics();
         },
         rating: function () {
-            this.resetTest();
-            this.hideAllTabs();
-            this.ratingModeView.render();
+            this.changeView(this.ratingModeView);
         },
         ratingList: function () {
-            this.resetTest();
-            this.hideAllTabs();
-            this.ratingListView.render();
+            if (typeof this.ratingListView === 'undefined') {
+                this.ratingListView = new RatingListView();
+            }
+            this.changeView(this.ratingListView);
         },
 
         // admin
         admin: function () {
-            this.hideAllTabs();
-            this.adminView.render();
+            if (typeof this.adminView === 'undefined') {
+                this.adminView = new AdminView();
+            }
+
+            this.changeView(this.adminView);
         },
         users: function () {
-            this.hideAllTabs();
-            this.usersListView.render();
+            if (typeof this.usersListView === 'undefined') {
+                this.usersListView = new UsersListView();
+            }
+            this.changeView(this.usersListView);
         },
         editVerb: function () {
             var id = Backbone.history.fragment.replace(/^.*[\\\/]/, ''),
@@ -217,9 +216,58 @@ define([
         },
 
 
-        // helpers
-        resetTest: function () {
+        // helpers,
+        bindListenersOnLogin: function (view) {
+            this.listenTo(view, 'reRenderMenu', this.mainMenuReRender);
+            this.listenTo(view, 'reRenderVerbsList', this.allVerbsReRender);
+            this.listenTo(view, 'renderHomeView', this.index);
+        },
+        changeView: function (view) {
+            if (this.currentView === view) {
+                this.currentView.show();
+            } else {
+
+                if (typeof this.currentView !== 'undefined') {
+                    this.currentView.hide();
+                }
+
+                this.currentView = view;
+
+                if (this.currentView.isRendered) {
+                    this.currentView.show();
+                } else {
+                    this.currentView.render();
+                }
+            }
+
+            if (this.currentPopup) {
+                this.closePopup();
+            }
+
             this.ratingModeView.resetTest();
+        },
+
+        showPopup: function (view) {
+            if (typeof this.currentView === 'undefined') {
+                this.index();
+            }
+            this.currentPopup = view;
+            view.render();
+        },
+
+        closePopup: function () {
+            if (this.currentPopup) {
+                this.currentPopup.$modal.modal('hide');
+            }
+
+            this.currentPopup = null;
+        },
+        goToPreviousRoute: function () {
+            if (this.previousRoute) {
+                window.router.navigate(this.previousRoute, {trigger: true});
+            } else {
+                window.router.navigate('', {trigger: true});
+            }
         },
         hideAllTabs: function () {
             $('.verbs-tab-block').hide();
@@ -235,7 +283,7 @@ define([
 
             this.alertView.render(data);
         },
-        allVerbsRender: function () {
+        allVerbsReRender: function () {
             this.hideAllTabs();
             this.allVerbsView.reRender();
         },
@@ -283,6 +331,12 @@ define([
                 'profile/settings',
                 'profile/statistics'
             ];
+
+            if (this.currentRoute !== null) {
+                this.previousRoute = this.currentRoute;
+            }
+
+            this.currentRoute = Backbone.history.getFragment();
 
             url = Backbone.history.getFragment();
 

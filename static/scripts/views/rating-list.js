@@ -4,52 +4,52 @@
 define([
     'jquery',
     'underscore',
-    'backbone'
-], function ($, _, Bacbone) {
+    '../utils/base-view'
+], function ($, _, BaseView) {
 
     'use strict';
 
-    return Bacbone.View.extend({
+    return BaseView.extend({
         className: 'b-rating-list verbs-tab-block',
         template: _.template($('#rating-list-template').html()),
-        initialize: function () {
-            this.isRendered = false;
+        getData: function () {
+            return $.ajax({
+                method: 'GET',
+                url: 'api/rating',
+                success: function (data) {
+                    if (data.err) {
+                        window.router.trigger('showAlert', {
+                            type: 'danger',
+                            text: data.err
+                        });
+                    }
+                }
+            });
         },
         render: function () {
             var that = this;
 
-            if (!this.isRendered) {
+            this.$el.html('');
 
-                $.ajax({
-                    method: 'GET',
-                    url: 'api/rating',
-                    success: function (data) {
-                        if (data.err) {
-                            window.router.trigger('showAlert', {
-                                type: 'danger',
-                                text: data.err
-                            });
-                        } else {
-                            _.each(data, function (el) {
-                                that.$el.append(that.template({
-                                    username: el.user.username,
-                                    score: el.score
-                                }));
-                            });
-
-                            $('.b-verbs-container').append(that.$el);
-
-                            that.isRendered = true;
-                        }
-                    }
+            this.getData().done(function (data) {
+                _.each(data, function (el) {
+                    that.$el.append(that.template({
+                        username: el.user.username,
+                        score: el.score
+                    }));
                 });
 
-                return false;
-            }
+                $('.b-verbs-container').append(that.$el);
+            });
+
+            this.isRendered = true;
 
             this.$el.show();
 
             return this;
+        },
+        show: function () {
+            this.render();
         }
     });
 

@@ -45,6 +45,8 @@ define([
                 admin: this.admin
             }));
 
+            console.log(1);
+
             this.$nav = this.$el.find('.nav');
             this.$join = this.$el.find('a[href=#join]');
 

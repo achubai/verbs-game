@@ -5,66 +5,47 @@
 define([
     'jquery',
     'underscore',
-    'backbone',
+    '../utils/base-view',
     '../views/users-list-item'
-], function ($, _, Backbone, UserItemView) {
+], function ($, _, BaseView, UserItemView) {
 
     'use strict';
 
-    return Backbone.View.extend({
-        tagName: 'tbody',
+    return BaseView.extend({
+        className: 'b-users verbs-tab-block',
         template: _.template($('#users-list-template').html()),
         events: {
         },
-        initialize: function () {
-            this.isRendered = false;
-            this.collection = null;
-
-            this.getUsersList();
+        getUsersList: function () {
+            return $.ajax({
+                method: 'GET',
+                url: '/api/users/'
+            });
         },
         render: function () {
-            var that = this;
+            var that = this,
+                list = [];
 
-            if (!this.isRendered) {
-                if (this.collection) {
-                    $('.b-verbs-container').append(this.template());
-                    _.each(this.collection, function (user) {
-                        var item = new UserItemView({model: user});
+            this.getUsersList().done(function (data) {
+                $('.b-verbs-container').append(that.$el.html(that.template()));
 
-                        that.$el.append(item.el);
-                    });
+                _.each(data.users, function (user) {
+                    var item = new UserItemView({model: user});
 
-                    $('.b-verbs-container').find('.b-users-table').append(this.$el);
-                    this.$el.parents('.b-users').show();
-                    this.isRendered = true;
+                    list.push(item.el);
+                });
 
-                    return this;
-                } else {
-                    this.getUsersList(this.render);
-                }
-            }
+                that.$el.find('tbody').append(list);
+            });
 
-            this.$el.parents('.b-users').show();
+            this.isRendered = true;
+
+            this.$el.show();
 
             return false;
         },
-        getUsersList: function (callback) {
-
-            var that = this;
-
-            $.ajax({
-                method: 'GET',
-                url: '/api/users/',
-                success: function (data) {
-                    that.collection = data.users;
-
-                    if (typeof callback === 'function') {
-                        callback.call(that);
-                    }
-                }
-            });
-
-            return false;
+        show: function () {
+            this.render();
         }
     });
 });

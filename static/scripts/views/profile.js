@@ -4,13 +4,13 @@
 define([
     'jquery',
     'underscore',
-    'backbone',
+    '../utils/base-view',
     '../views/settings'
-], function ($, _, Backbone, SettingsView) {
+], function ($, _, BaseView, SettingsView) {
 
     'use strict';
 
-    return Backbone.View.extend({
+    return BaseView.extend({
         className: 'b-profile verbs-tab-block',
         template: _.template($('#profile-template').html()),
         settingsView: new SettingsView(),
@@ -26,36 +26,32 @@ define([
 
             this.userId = localData ? localData.id : '';
 
-            if (!this.isRendered) {
-                if (!$('.b-profile').length) {
+            if (!$('.b-profile').length) {
 
-                    $.ajax({
-                        method: 'GET',
-                        url: '/api/users/' + that.userId,
-                        success: function (data) {
+                $.ajax({
+                    method: 'GET',
+                    url: '/api/users/' + that.userId,
+                    success: function (data) {
 
-                            $('.b-verbs-container').append(
-                                that.$el.html(that.template({
-                                    email: data.email,
-                                    username: data.username
-                                }))
-                            );
-                            that.isRendered = true;
-                            that.activateTab();
+                        $('.b-verbs-container').append(
+                            that.$el.html(that.template({
+                                email: data.email,
+                                username: data.username
+                            }))
+                        );
+                        that.isRendered = true;
+                        that.activateTab();
 
-                            if (typeof callback === 'function') {
-                                callback.call(that);
-                            }
+                        if (typeof callback === 'function') {
+                            callback.call(that);
                         }
-                    });
+                    }
+                });
 
-                    return this;
-                }
+                return this;
             }
 
             this.activateTab();
-            this.$el.show();
-
         },
         changePassword: function (e) {
             var that = this,
@@ -127,6 +123,10 @@ define([
         },
         showStatistics: function () {
             console.log('showStatistics');
+        },
+        show: function () {
+            this.activateTab();
+            this.$el.show();
         }
     });
 });

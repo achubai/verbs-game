@@ -5,23 +5,21 @@
 define([
     'jquery',
     'underscore',
-    'backbone',
+    '../utils/base-view',
     'views/all-verbs-item',
     'views/verb-item-edit',
     'models/verb',
     'bootstrap'
-], function ($, _, Backbone, AllVerbsItem, VerbItemEditView, VerbModel) {
+], function ($, _, BaseView, AllVerbsItem, VerbItemEditView, VerbModel) {
 
     'use strict';
 
-    return Backbone.View.extend({
+    return BaseView.extend({
         className: 'b-verbs-list verbs-tab-block',
         template: _.template($('#verbs-list-template').html()),
         verbsArray: [],
         events: {
             'keyup #search': 'renderList'
-        },
-        initialize: function () {
         },
         render: function () {
             var userData = localStorage.getItem('verbsUserData'),
@@ -102,6 +100,9 @@ define([
         reRender: function () {
             this.$el.parents('.b-verbs-container').html('');
             this.$el.html('');
+            this.render();
+        },
+        show: function () {
             this.render();
         }
     });

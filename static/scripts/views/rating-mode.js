@@ -4,15 +4,14 @@
 define([
     'jquery',
     'underscore',
-    'backbone',
+    '../utils/base-view',
     '../utils/verbs',
     '../utils/stats'
-], function ($, _, Backbone, verbsUtils, statsUtils) {
+], function ($, _, BaseView, verbsUtils, statsUtils) {
 
     'use strict';
 
-    return Backbone.View.extend({
-
+    return BaseView.extend({
         className: 'b-rating verbs-tab-block',
         template: _.template($('#rating-template').html()),
         events: {
@@ -113,6 +112,8 @@ define([
 
             this.$el.show();
 
+            this.isRendered = true;
+
             return this;
         },
         beforeStartTest: function () {
@@ -211,8 +212,8 @@ define([
                     if (verbsUtils.checkVerb(this.$input.val().trim(), this.verb['v' + this.verb.time])) {
                         this.isCorrect();
                     } else {
-                        // this.isCorrect();
-                        this.isIncorrect();
+                         this.isCorrect();
+                        //this.isIncorrect();
                     }
 
                     this.catchStats(this.successVerb);
